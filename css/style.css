@@ -1,0 +1,332 @@
+/* =====================================================================
+   ADVENT CALENDAR — STYLES (mobile-first, light "Christmas" theme)
+   ===================================================================== */
+
+:root {
+  --bg:        #f1efec;   /* page background */
+  --card:      #ffffff;   /* card surface   */
+  --red:       #c0392b;   /* festive red accent */
+  --red-soft:  #d98b82;
+  --green:     #1b5e3f;
+  --green-500: #2e7d55;
+  --gold:      #e0a526;
+  --ink:       #2b2b2b;
+  --muted:     #8a8a86;
+  --line:      rgba(0,0,0,.08);
+  --radius:    16px;
+  --font-en:   "Fraunces", Georgia, serif;
+  --font-ui:   "Nunito", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+/* The [hidden] attribute must win over display rules (e.g. .screen). */
+[hidden] { display: none !important; }
+
+html, body { margin: 0; min-height: 100%; }
+
+body {
+  font-family: var(--font-ui);
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+body[data-lang="si"] { font-family: "Noto Sans Sinhala", var(--font-ui); }
+body[data-lang="ta"] { font-family: "Noto Sans Tamil", var(--font-ui); }
+body.no-scroll { overflow: hidden; }
+
+.app { max-width: 820px; margin: 0 auto; position: relative; }
+
+/* Each screen is a full, self-contained page. */
+.screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+}
+
+/* ---- Buttons ------------------------------------------------------ */
+.btn-primary {
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 14px 32px;
+  font-size: 17px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(192,57,43,.25);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 12px 22px;
+  font-size: 16px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.btn-ghost.danger { border-color: rgba(192,57,43,.4); color: var(--red); }
+.icon-btn {
+  background: rgba(0,0,0,.05);
+  border: none;
+  color: var(--ink);
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  font-size: 19px;
+  cursor: pointer;
+}
+
+/* ===================================================================
+   1) LANGUAGE PICKER
+   =================================================================== */
+#screen-language { align-items: center; justify-content: center; text-align: center; }
+.lang-wrap { width: 100%; max-width: 360px; }
+.lang-mark { font-size: 50px; color: var(--red); margin-bottom: 6px; }
+.lang-title { font-family: var(--font-en); font-weight: 600; font-size: 32px; margin: 0 0 6px; color: var(--green); letter-spacing: .02em; }
+.lang-sub { color: var(--muted); font-size: 14px; margin: 0 0 32px; line-height: 1.6; }
+.lang-buttons { display: flex; flex-direction: column; gap: 14px; }
+.lang-btn {
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  color: var(--ink);
+  border-radius: var(--radius);
+  padding: 18px;
+  font-size: 20px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,.05);
+  transition: transform .12s, border-color .2s;
+}
+.lang-btn:active { transform: scale(.97); }
+.lang-btn:hover { border-color: var(--red); }
+.lang-btn[data-lang="si"] { font-family: "Noto Sans Sinhala", sans-serif; }
+.lang-btn[data-lang="ta"] { font-family: "Noto Sans Tamil", sans-serif; }
+
+/* ===================================================================
+   2) ONBOARDING / INTRO
+   =================================================================== */
+#screen-onboarding { overflow: hidden; }
+.onb { display: flex; flex-direction: column; flex: 1; width: 100%; max-width: 440px; margin: 0 auto; padding: 24px 8px; }
+.onb-slides { flex: 1; display: flex; transition: transform .35s ease; align-items: center; }
+.onb-slide { min-width: 100%; text-align: center; padding: 0 12px; }
+.onb-art { font-size: 72px; margin-bottom: 20px; }
+.onb-title { font-family: var(--font-en); font-weight: 600; font-size: 27px; margin: 0 0 14px; color: var(--green); }
+body[data-lang="si"] .onb-title, body[data-lang="ta"] .onb-title { font-family: inherit; }
+.onb-body { font-size: 17px; line-height: 1.7; color: #55554f; max-width: 340px; margin: 0 auto; }
+.onb-dots { display: flex; justify-content: center; gap: 8px; margin: 20px 0; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(0,0,0,.15); transition: all .2s; }
+.dot.is-active { background: var(--red); width: 22px; border-radius: 4px; }
+.onb-actions { display: flex; justify-content: space-between; align-items: center; }
+
+/* ===================================================================
+   3) CALENDAR GRID (HOME)
+   =================================================================== */
+#screen-calendar { padding-top: 10px; }
+.topbar {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  padding: 18px 48px 4px;
+  text-align: center;
+}
+.topbar-brand { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
+.topbar-kicker { font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--green-500); }
+.topbar-title { font-family: var(--font-en); font-weight: 600; font-size: 26px; margin: 2px 0; color: var(--red); letter-spacing: .03em; }
+.topbar-sub { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+.topbar .icon-btn { position: absolute; right: 8px; top: 16px; }
+.scene-progress { text-align: center; color: var(--muted); font-size: 14px; margin: 6px 0 14px; }
+
+/* ---- Grid of illustrated day-cards ---- */
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  padding: 0 2px 40px;
+}
+@media (min-width: 560px) { .day-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; } }
+@media (min-width: 760px) { .day-grid { grid-template-columns: repeat(4, 1fr); } }
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: none;
+  border-radius: 14px;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--card);
+  box-shadow: 0 6px 18px rgba(0,0,0,.09);
+  transition: transform .14s, box-shadow .2s;
+  font-family: inherit;
+}
+.card.is-unlocked:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(0,0,0,.14); }
+.card.is-unlocked:active { transform: scale(.98); }
+
+/* Illustration area (portrait 3:4) */
+.card-art { position: relative; width: 100%; aspect-ratio: 3 / 4; background: #f3ecdc; overflow: hidden; }
+.card-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Placeholder shown when art is missing (card gets .noimg) */
+.card-ph {
+  display: none;
+  position: absolute; inset: 0;
+  flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  background: linear-gradient(170deg, #fbf5e8, #f0e4cc);
+  color: #c9a24a;
+}
+.card.noimg .card-img { display: none; }
+.card.noimg .card-ph { display: flex; }
+.card-ph-num { font-family: var(--font-en); font-weight: 600; font-size: clamp(30px, 9vw, 44px); color: var(--red); opacity: .55; }
+.card-ph-mark { font-size: 18px; opacity: .5; }
+.card-badge { position: absolute; top: 7px; right: 8px; font-size: 17px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+
+.card-cap { padding: 8px 6px; text-align: center; background: var(--card); }
+.card-day { font-family: var(--font-en); font-weight: 600; font-size: 15px; color: var(--red); letter-spacing: .02em; }
+
+/* Locked "wrapped" cover */
+.card.is-locked { cursor: default; }
+.card-cover {
+  position: relative;
+  width: 100%; aspect-ratio: 3 / 4.5;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  background:
+    repeating-linear-gradient(135deg, rgba(255,255,255,.04) 0 10px, rgba(0,0,0,.03) 10px 20px),
+    linear-gradient(160deg, #1b5e3f, #0f3d2e);
+  color: #f3ecdc;
+}
+.card-cover-num { font-family: var(--font-en); font-weight: 600; font-size: clamp(30px, 9vw, 44px); color: var(--gold); }
+.card-cover-lock { font-size: 15px; opacity: .8; }
+
+/* Today highlight + ribbon */
+.card.is-today { outline: 3px solid var(--red); outline-offset: -3px; }
+.card.is-today::before {
+  content: "TODAY";
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  font-size: 9px; font-weight: 800; letter-spacing: .14em;
+  background: var(--red); color: #fff; padding: 3px 10px; border-radius: 0 0 8px 8px; z-index: 3;
+}
+body[data-lang="si"] .card.is-today::before { content: "අද"; }
+body[data-lang="ta"] .card.is-today::before { content: "இன்று"; }
+
+/* Christmas Day */
+.card--special .card-day { color: var(--gold); }
+.card--special.is-locked .card-cover { background: linear-gradient(160deg, #8a6d1e, #5a4612); }
+
+/* ===================================================================
+   DAY CARD + SETTINGS POP-UPS (centered modals)
+   =================================================================== */
+.sheet { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; }
+.sheet-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.5); opacity: 0; transition: opacity .25s; }
+.sheet.is-open .sheet-backdrop { opacity: 1; }
+.sheet-panel {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 22px;
+  padding: 22px 22px 24px;
+  max-height: 88vh; overflow-y: auto;
+  transform: scale(.9); opacity: 0;
+  transition: transform .26s cubic-bezier(.2,.9,.3,1), opacity .2s ease;
+  box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+.sheet.is-open .sheet-panel { transform: scale(1); opacity: 1; }
+.sheet-handle { display: none; } /* bottom-sheet grip not needed for a pop-up */
+.sheet-close { position: absolute; top: 12px; right: 14px; z-index: 2; }
+
+/* Day content */
+/* Illustration at the top of the day pop-up */
+.day-illus { position: relative; width: 100%; aspect-ratio: 3 / 4; max-height: 42vh; margin: 2px 0 16px; border-radius: 16px; overflow: hidden; background: #f3ecdc; }
+.day-illus-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.day-illus-ph { display: none; position: absolute; inset: 0; align-items: center; justify-content: center; background: linear-gradient(170deg, #fbf5e8, #f0e4cc); color: var(--red); font-family: var(--font-en); font-weight: 600; font-size: 46px; opacity: .5; }
+.day-illus.noimg .day-illus-img { display: none; }
+.day-illus.noimg .day-illus-ph { display: flex; }
+
+.day-head { display: flex; align-items: baseline; gap: 10px; margin: 2px 0 10px; }
+.day-badge { background: var(--green); color: #fff; font-weight: 700; padding: 4px 12px; border-radius: 999px; font-size: 14px; }
+.day-date { color: var(--muted); font-size: 15px; }
+.day-title { font-family: var(--font-en); font-weight: 600; font-size: 24px; color: var(--red); margin: 0 0 18px; }
+body[data-lang="si"] .day-title, body[data-lang="ta"] .day-title { font-family: inherit; }
+
+.day-section { margin-bottom: 22px; }
+.day-section-title { display: flex; align-items: center; gap: 8px; font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--green-500); margin: 0 0 8px; }
+body[data-lang="si"] .day-section-title, body[data-lang="ta"] .day-section-title { text-transform: none; }
+.sec-icon { font-size: 18px; }
+.verse { font-family: var(--font-en); font-size: 22px; line-height: 1.5; margin: 0; color: var(--green); font-weight: 500; border-left: 3px solid var(--gold); padding-left: 14px; }
+body[data-lang="si"] .verse, body[data-lang="ta"] .verse { font-family: inherit; }
+.verse-ref { display: block; margin-top: 8px; padding-left: 14px; color: var(--gold); font-style: normal; font-weight: 700; font-size: 15px; }
+.day-section p { font-size: 17px; line-height: 1.7; margin: 0; color: #3b3b37; }
+
+/* Step 2: reveal activity */
+.btn-reveal {
+  width: 100%;
+  margin: 4px 0 8px;
+  background: #fff;
+  color: var(--green);
+  border: 1.5px dashed var(--green-500);
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-reveal:active { transform: scale(.98); }
+.day-activity { animation: fadeUp .3s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.btn-done {
+  width: 100%;
+  margin-top: 6px;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 15px;
+  font-size: 17px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-done.is-done { background: var(--gold); color: #4a2f00; }
+.btn-done .star { font-size: 20px; }
+
+/* Settings */
+.sheet-title { font-family: var(--font-en); font-weight: 600; margin: 2px 0 18px; color: var(--green); }
+.field-label { display: block; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--green-500); margin-bottom: 8px; }
+.seg { display: flex; gap: 8px; margin-bottom: 24px; }
+.seg button { flex: 1; padding: 12px 6px; border: 1.5px solid var(--line); background: #fff; color: var(--ink); border-radius: 12px; font-size: 15px; font-family: inherit; cursor: pointer; }
+.seg button[data-lang="si"] { font-family: "Noto Sans Sinhala", sans-serif; }
+.seg button[data-lang="ta"] { font-family: "Noto Sans Tamil", sans-serif; }
+.seg button.is-active { background: var(--green); color: #fff; border-color: var(--green); }
+#settings-sheet .btn-ghost { display: block; width: 100%; margin-bottom: 10px; }
+
+/* ===================================================================
+   TOAST
+   =================================================================== */
+.toast {
+  position: fixed;
+  left: 50%; bottom: calc(28px + env(safe-area-inset-bottom));
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(30,30,28,.95);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-size: 15px;
+  z-index: 60;
+  opacity: 0;
+  transition: opacity .25s, transform .25s;
+  box-shadow: 0 8px 24px rgba(0,0,0,.3);
+  max-width: 88vw; text-align: center;
+}
+.toast.is-show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; animation: none !important; } }

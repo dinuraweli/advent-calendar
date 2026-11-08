@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f3d2e" />
+  <title>Advent Calendar</title>
+
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+
+  <!-- Fonts: English display + Noto Sans Sinhala + Noto Sans Tamil -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Noto+Sans+Sinhala:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app" class="app">
+
+    <!-- ============ SCREEN: Language picker ============ -->
+    <section id="screen-language" class="screen" hidden>
+      <div class="lang-wrap">
+        <div class="lang-mark" aria-hidden="true">✶</div>
+        <h1 class="lang-title">Advent Calendar</h1>
+        <p class="lang-sub">Choose your language · භාෂාව තෝරන්න · மொழியைத் தேர்ந்தெடுக்கவும்</p>
+        <div class="lang-buttons">
+          <button class="lang-btn" data-lang="en"><span>English</span></button>
+          <button class="lang-btn" data-lang="si" lang="si"><span>සිංහල</span></button>
+          <button class="lang-btn" data-lang="ta" lang="ta"><span>தமிழ்</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN: Onboarding ============ -->
+    <section id="screen-onboarding" class="screen" hidden>
+      <div class="onb">
+        <div class="onb-slides" id="onb-slides"><!-- slides injected --></div>
+        <div class="onb-dots" id="onb-dots"></div>
+        <div class="onb-actions">
+          <button class="btn-ghost" id="onb-skip" data-i18n="skip">Skip</button>
+          <button class="btn-primary" id="onb-next" data-i18n="next">Next</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN: Calendar grid (home) ============ -->
+    <section id="screen-calendar" class="screen" hidden>
+      <header class="topbar">
+        <div class="topbar-brand">
+          <span class="topbar-kicker" data-i18n="theWord">The</span>
+          <h1 class="topbar-title" data-i18n="appTitle">Advent Calendar</h1>
+          <span class="topbar-sub" data-i18n="appSubtitle">One Day · One Gift</span>
+        </div>
+        <button class="icon-btn" id="open-settings" aria-label="Settings">⚙️</button>
+      </header>
+      <p class="scene-progress" id="scene-progress"></p>
+      <div class="day-grid" id="day-grid"><!-- illustrated day cards injected --></div>
+    </section>
+
+    <!-- ============ Day card (overlay sheet) ============ -->
+    <div id="day-sheet" class="sheet" hidden>
+      <div class="sheet-backdrop" data-close-sheet></div>
+      <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="day-heading">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="icon-btn sheet-close" data-close-sheet aria-label="Close">✕</button>
+        <div class="sheet-body" id="sheet-body"><!-- day content injected --></div>
+        <button class="btn-done" id="day-done-btn"><span class="star">☆</span> <span data-i18n="markDone">Mark as done</span></button>
+      </div>
+    </div>
+
+    <!-- ============ Settings (overlay sheet) ============ -->
+    <div id="settings-sheet" class="sheet" hidden>
+      <div class="sheet-backdrop" data-close-settings></div>
+      <div class="sheet-panel" role="dialog" aria-modal="true">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="icon-btn sheet-close" data-close-settings aria-label="Close">✕</button>
+        <div class="sheet-body">
+          <h2 class="sheet-title" data-i18n="settings">Settings</h2>
+          <label class="field-label" data-i18n="language">Language</label>
+          <div class="seg" id="lang-seg">
+            <button data-lang="en">English</button>
+            <button data-lang="si" lang="si">සිංහල</button>
+            <button data-lang="ta" lang="ta">தமிழ்</button>
+          </div>
+          <button class="btn-ghost danger" id="reset-progress" data-i18n="resetProgress">Reset progress</button>
+          <button class="btn-ghost" id="replay-intro" data-i18n="replayIntro">Show intro again</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ Toast ============ -->
+    <div id="toast" class="toast" hidden></div>
+  </div>
+
+  <script src="content.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/calendar.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
