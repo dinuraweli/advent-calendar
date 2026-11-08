@@ -80,7 +80,7 @@ const AdventCal = (() => {
     if (day === 25) el.classList.add("card--special");
 
     if (unlocked) {
-      // Show the illustration (with a graceful placeholder fallback).
+      // Show the illustration (with a graceful placeholder fallback) + theme.
       el.innerHTML =
         '<div class="card-art">' +
           '<img class="card-img" loading="lazy" alt="" src="' + dayImage(day) + '" ' +
@@ -88,7 +88,10 @@ const AdventCal = (() => {
           '<div class="card-ph"><span class="card-ph-num">' + day + '</span><span class="card-ph-mark">✦</span></div>' +
           (done ? '<span class="card-badge">⭐</span>' : "") +
         "</div>" +
-        '<div class="card-cap"><span class="card-day">' + dayLabel(day) + "</span></div>";
+        '<div class="card-cap">' +
+          '<span class="card-day">' + dayLabel(day) + "</span>" +
+          '<span class="card-theme">' + esc(dayTitle(day)) + "</span>" +
+        "</div>";
     } else {
       // Locked: a "wrapped" cover — no art spoiler.
       el.innerHTML =
@@ -107,6 +110,14 @@ const AdventCal = (() => {
       ((ADVENT_I18N[document.body.dataset.lang] || ADVENT_I18N.en).dayWord)) ?
       (ADVENT_I18N[document.body.dataset.lang] || ADVENT_I18N.en).dayWord + " " + day :
       "Day " + day;
+  }
+
+  // The day's theme title in the current language (for the card caption).
+  function dayTitle(day) {
+    const lang = document.body.dataset.lang || "en";
+    const data = ADVENT_CONTENT.days.find(x => x.day === day);
+    const c = data && (data[lang] || data.en);
+    return (c && c.title) || "";
   }
 
   // ---- Day card rendering (two steps) ------------------------------

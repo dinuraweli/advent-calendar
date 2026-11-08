@@ -9,7 +9,7 @@
    Bump CACHE_VERSION on any release so old caches are purged on activate.
    ===================================================================== */
 
-const CACHE_VERSION = "advent-v10";
+const CACHE_VERSION = "advent-v11";
 
 const APP_SHELL = [
   "./",
