@@ -18,16 +18,24 @@ const AdventCal = (() => {
   // ---- Date helpers -------------------------------------------------
 
   // Returns "today" as a local date at midnight. Supports a debug
-  // override via ?debug=YYYY-MM-DD for testing locked/unlocked states.
+  // override via ?preview=YYYY-MM-DD (or ?debug=) for testing and for
+  // showing reviewers how the calendar looks on a given day.
   function getToday() {
     const params = new URLSearchParams(location.search);
-    const debug = params.get("debug");
+    const debug = params.get("preview") || params.get("debug");
     if (debug && /^\d{4}-\d{2}-\d{2}$/.test(debug)) {
       const [y, m, d] = debug.split("-").map(Number);
       return new Date(y, m - 1, d);
     }
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+
+  // The preview date string if one is set in the URL, otherwise null.
+  function previewDate() {
+    const params = new URLSearchParams(location.search);
+    const v = params.get("preview") || params.get("debug");
+    return v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null;
   }
 
   function dayDate(day) {
@@ -167,7 +175,7 @@ const AdventCal = (() => {
   }
 
   return {
-    ADVENT_YEAR, getToday, isUnlocked, unlockedCount, currentDay,
+    ADVENT_YEAR, getToday, previewDate, isUnlocked, unlockedCount, currentDay,
     renderGrid, renderDay
   };
 })();

@@ -333,3 +333,16 @@ body[data-lang="si"] .verse, body[data-lang="ta"] .verse { font-family: inherit;
 .toast.is-show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; animation: none !important; } }
+
+/* Preview banner (only when ?preview=YYYY-MM-DD is set) */
+.preview-banner {
+  margin: 0 16px 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #fff4d6;
+  border: 1px solid var(--gold);
+  color: var(--ink);
+  font-size: .9rem;
+  line-height: 1.4;
+  text-align: center;
+}

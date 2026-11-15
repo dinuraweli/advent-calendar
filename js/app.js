@@ -48,9 +48,24 @@
     applyLang();
     if (!state.seenIntro) { renderOnboarding(); show("onboarding"); return; }
     renderHome();
+    renderPreviewBanner();
     show("calendar");
     const openDayParam = +qp.get("open");
     if (openDayParam && AdventCal.isUnlocked(openDayParam)) openDay(openDayParam);
+  }
+
+  // Shown only when ?preview=YYYY-MM-DD is in the URL, so reviewers know
+  // the locked days are locked on purpose.
+  function renderPreviewBanner() {
+    const el = document.getElementById("preview-banner");
+    const v = AdventCal.previewDate();
+    if (!v) { el.hidden = true; return; }
+    const [y, m, d] = v.split("-").map(Number);
+    const label = new Date(y, m - 1, d).toLocaleDateString("en-GB",
+      { day: "numeric", month: "long", year: "numeric" });
+    el.textContent = "Preview: showing the calendar as it will look on " + label +
+      ". Later days are locked until their date.";
+    el.hidden = false;
   }
 
   // ---- Language ----------------------------------------------------

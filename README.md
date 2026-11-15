@@ -58,11 +58,11 @@ python3 -m http.server 8000
 Then visit <http://localhost:8000>.
 
 ### Testing locked/unlocked days
-Add `?debug=YYYY-MM-DD` to pretend it's a certain date:
+Add `?preview=YYYY-MM-DD` (or `?debug=`) to pretend it's a certain date:
 
-- <http://localhost:8000/?debug=2025-12-01> → only Day 1 open
-- <http://localhost:8000/?debug=2025-12-10> → Days 1–10 open, 11–25 locked
-- <http://localhost:8000/?debug=2025-12-25> → everything open, center candle lit
+- <http://localhost:8000/?preview=2026-12-01> → only Day 1 open
+- <http://localhost:8000/?preview=2026-12-10> → Days 1–10 open, 11–25 locked
+- <http://localhost:8000/?preview=2026-12-25> → everything open, center candle lit
 
 To start fresh (clear language/intro/stars), open the browser console and run
 `localStorage.clear()`, or use **Settings → Reset progress / Show intro again**.
