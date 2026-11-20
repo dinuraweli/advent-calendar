@@ -126,8 +126,9 @@
     };
   }
 
+  // A lit candle for each intro slide (Advent wreath colours).
   function onbArt(i) {
-    return ["🕯️", "🎁", "📆", "✨"][i] || "✨";
+    return '<span class="onb-candle">' + AdventCal.candleSVG(["hope", "peace", "joy", "love"][i] || "christ", true) + "</span>";
   }
 
   function updateOnb() {
@@ -161,7 +162,8 @@
     AdventCal.renderGrid(document.getElementById("day-grid"), {
       doneSet: state.done,
       onOpenDay: openDay,
-      onLockedDay: lockedDay
+      onLockedDay: lockedDay,
+      onPendingDay: () => toast(t().pendingToast)
     });
     const n = AdventCal.unlockedCount();
     document.getElementById("scene-progress").textContent = n > 0
@@ -198,30 +200,60 @@
     requestAnimationFrame(() => reader.classList.add("is-open"));
 
     if (cardEl && !reduceMotion()) {
-      playPageTurn(cardEl);
-      setTimeout(() => showScroll(scrollReading), 420);
+      playOpening(cardEl, () => showScroll(scrollReading));
     } else {
       showScroll(scrollReading);
     }
   }
 
-  // A page lifts off the tapped card and swings open like a book cover.
-  function playPageTurn(cardEl) {
+  // 1) The tapped card zooms out to the centre of the screen.
+  // 2) Its front swings open like the page of a book.
+  // 3) The scroll unrolls (onOpened).
+  function playOpening(cardEl, onOpened) {
     const r = cardEl.getBoundingClientRect();
-    const img = cardEl.querySelector(".card-img");
+    const vw = window.innerWidth, vh = window.innerHeight;
+    let tw = Math.min(vw * 0.62, 280);
+    let th = tw * r.height / r.width;
+    if (th > vh * 0.62) { th = vh * 0.62; tw = th * r.width / r.height; }
+    const tl = (vw - tw) / 2, tt = (vh - th) / 2;
+
+    // The moving page is a copy of the card itself.
     const front = pageTurn.querySelector(".page-front");
-    front.style.backgroundImage = img && !cardEl.classList.contains("noimg")
-      ? 'url("' + img.getAttribute("src") + '")' : "";
-    front.dataset.date = cardEl.querySelector(".card-date-chip")
-      ? cardEl.querySelector(".card-date-chip").textContent : "";
+    front.innerHTML = "";
+    const copy = cardEl.cloneNode(true);
+    copy.removeAttribute("id");
+    copy.classList.remove("is-today");
+    copy.setAttribute("tabindex", "-1");
+    front.appendChild(copy);
+
     Object.assign(pageTurn.style, {
-      left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px"
+      left: tl + "px", top: tt + "px", width: tw + "px", height: th + "px"
     });
     pageTurn.hidden = false;
-    pageTurn.classList.remove("is-turning");
-    void pageTurn.offsetWidth;            // restart the animation
-    pageTurn.classList.add("is-turning");
-    setTimeout(() => { pageTurn.hidden = true; pageTurn.classList.remove("is-turning"); }, 900);
+    cardEl.style.visibility = "hidden";
+
+    const leaf = pageTurn.querySelector(".page-leaf");
+    const zoom = pageTurn.animate([
+      { transform: "translate(" + (r.left - tl) + "px," + (r.top - tt) + "px) scale(" + (r.width / tw) + ")" },
+      { transform: "translate(0,0) scale(1)" }
+    ], { duration: 520, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" });
+
+    zoom.onfinish = () => {
+      const turn = leaf.animate([
+        { transform: "rotateY(0deg)" },
+        { transform: "rotateY(-12deg) translateZ(30px)", offset: 0.15 },
+        { transform: "rotateY(-178deg)" }
+      ], { duration: 850, easing: "cubic-bezier(.45,.05,.3,1)", fill: "both" });
+      const fade = pageTurn.animate([{ opacity: 1 }, { opacity: 1, offset: 0.65 }, { opacity: 0 }],
+        { duration: 850, fill: "both" });
+      setTimeout(onOpened, 380);
+      turn.onfinish = () => {
+        pageTurn.hidden = true;
+        zoom.cancel(); turn.cancel(); fade.cancel();
+        front.innerHTML = "";
+        cardEl.style.visibility = "";
+      };
+    };
   }
 
   function showScroll(el) {
@@ -259,7 +291,7 @@
   }
 
   // Close buttons / backdrop: unwind the history entries we added, so the
-  // phone's Back button and our ✕ behave the same way.
+  // phone's Back button and our close button behave the same way.
   function requestClose() {
     if (historyDepth > 0) {
       history.go(-historyDepth);
@@ -305,21 +337,30 @@
     const btn = document.getElementById("day-done-btn");
     const done = state.done.has(state.activeDay);
     btn.classList.toggle("is-done", done);
-    btn.querySelector(".star").textContent = done ? "⭐" : "☆";
+    btn.querySelector(".star").innerHTML = done ? AdventCal.ICONS.star : AdventCal.ICONS.starOutline;
     btn.querySelector(".done-label").textContent = done ? dict.markedDone : dict.markDone;
   }
 
+  // Marking the act as done shows the star briefly, then closes the scroll.
+  // Tapping again on a day already done un-marks it.
   function toggleDone() {
     const d = state.activeDay;
-    if (state.done.has(d)) state.done.delete(d);
-    else {
-      state.done.add(d);
-      const btn = document.getElementById("day-done-btn");
-      btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop");
+    const btn = document.getElementById("day-done-btn");
+    if (state.done.has(d)) {
+      state.done.delete(d);
+      saveDone(); updateDoneBtn(); renderHome();
+      return;
     }
+    state.done.add(d);
     saveDone();
     updateDoneBtn();
-    renderHome();
+    btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop");
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.disabled = false;
+      renderHome();
+      requestClose();
+    }, 800);
   }
 
   // ---- Settings sheet ----------------------------------------------

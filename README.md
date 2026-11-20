@@ -6,12 +6,13 @@ the **First Sunday of Advent (Sunday 29 November 2026) to Christmas Day** —
 
 - Pick a language → a short intro → the calendar.
 - A **progress bar** across the top marks the four Sundays of Advent with
-  candles (Hope, Peace, Joy, Love) and Christmas Day. Each candle lights up
+  candles and Christmas Day. Each candle lights up
   when its Sunday arrives.
-- Days are grouped by week. Tapping a day plays a **page-opening** animation,
-  then a **parchment scroll** unrolls with the day's theme, scripture verse and
-  reflection. A button at the end opens a **second scroll** with the day's task,
-  where children can mark the day done with a ⭐.
+- Days are grouped by week. Tapping a day zooms its card to the centre of
+  the screen, the card opens like a page, then a **parchment scroll** unrolls
+  with the day's theme, readings and reflection. A button at the end opens a
+  **second scroll** with Today's Act. Marking it done adds a star to the day
+  and closes the scroll.
 - **Future days stay locked** until their date (based on the phone's clock).
 - The phone's Back button closes the scroll, like a normal page.
 - Works **offline** after the first load and can be "added to home screen".
@@ -22,29 +23,27 @@ No build step, no server, no accounts. Just static files.
 
 ## ✍️ Editing the daily content
 
-All the day-by-day text lives in **`content.js`**, one entry per day in date
-order. Each entry has:
+All the day-by-day text lives in **`content.js`**. Only text provided by the
+Sunday school goes there. Each day is one entry:
 
 | Field        | What it is                                              |
 |--------------|---------------------------------------------------------|
 | `date`       | `"MM-DD"` — the day unlocks on this date                |
-| `img`        | picture file in `assets/days/` (`""` for none)          |
 | `feast`      | optional saint's day / feast                            |
-| `title`      | the day's theme                                         |
-| `verse`      | the scripture text shown on the scroll                  |
-| `reference`  | e.g. `"Mark 13:33"`                                     |
-| `readings`   | optional: the day's full readings                       |
+| `title`      | the reflection's theme                                  |
+| `readings`   | optional: the day's readings                            |
 | `reflection` | the reflection                                          |
-| `actTitle`   | optional heading for the day's task                     |
-| `activity`   | the task (lines starting `- ` become a bullet list)     |
+| `actTitle`   | the name of Today's Act                                 |
+| `activity`   | Today's Act (lines starting `- ` become a bullet list)  |
+| `img`        | optional picture file in `assets/days/`                 |
 
-Week 1 comes from the Sunday school's reflections document. Weeks 2–4 are
-drafts to review. Sinhala and Tamil are still placeholders.
+Only the First Week of Advent has text so far. Days without an entry still
+appear on the calendar but can't be opened until their text is added.
 
 The app's buttons, candle names and intro pages are in **`js/i18n.js`**.
 
-**After editing:** bump `CACHE_VERSION` in `sw.js` (e.g. `advent-v14` →
-`advent-v15`) so phones that have the app pick up the new text.
+**After editing:** bump `CACHE_VERSION` in `sw.js` (e.g. `advent-v15` →
+`advent-v16`) so phones that have the app pick up the new text.
 
 ---
 
