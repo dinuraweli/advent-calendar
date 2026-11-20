@@ -184,7 +184,14 @@
   const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   let historyDepth = 0;   // how many history entries the reader has pushed
 
+  // Easing curves used throughout, so every motion feels like one family.
+  const EASE_OUT = "cubic-bezier(.22,1,.36,1)";      // quick start, long soft landing
+  const EASE_IN_OUT = "cubic-bezier(.65,0,.35,1)";   // gentle both ends
+  const EASE_IN = "cubic-bezier(.55,0,.75,.25)";     // for rolling things away
+  let busy = false;                                  // ignore taps mid-animation
+
   function openDay(day, cardEl) {
+    if (busy) return;
     state.activeDay = day;
     document.getElementById("reading-body").innerHTML = AdventCal.renderReading(day, state.lang);
     document.getElementById("task-body").innerHTML = AdventCal.renderTask(day, state.lang);
@@ -197,34 +204,37 @@
     lockScroll(true);
     reader.hidden = false;
     scrollTask.hidden = true;
+    scrollReading.hidden = true;
     requestAnimationFrame(() => reader.classList.add("is-open"));
 
     if (cardEl && !reduceMotion()) {
-      playOpening(cardEl, () => showScroll(scrollReading));
+      busy = true;
+      playOpening(cardEl, () => unroll(scrollReading)).then(() => { busy = false; });
     } else {
-      showScroll(scrollReading);
+      unroll(scrollReading);
     }
   }
 
-  // 1) The tapped card zooms out to the centre of the screen.
-  // 2) Its front swings open like the page of a book.
-  // 3) The scroll unrolls (onOpened).
-  function playOpening(cardEl, onOpened) {
+  // One continuous timeline (times in ms, each stage overlaps the next):
+  //    0 – 620   the card lifts and glides to the centre of the screen
+  //  480 – 1380  its cover swings open like a book, light glowing inside
+  //  900         the scroll begins to unroll underneath
+  // 1000 – 1400  the opened card dissolves into the scroll
+  function playOpening(cardEl, startScroll) {
     const r = cardEl.getBoundingClientRect();
     const vw = window.innerWidth, vh = window.innerHeight;
     let tw = Math.min(vw * 0.62, 280);
     let th = tw * r.height / r.width;
-    if (th > vh * 0.62) { th = vh * 0.62; tw = th * r.width / r.height; }
+    if (th > vh * 0.6) { th = vh * 0.6; tw = th * r.width / r.height; }
     const tl = (vw - tw) / 2, tt = (vh - th) / 2;
+    const s0 = r.width / tw;
 
-    // The moving page is a copy of the card itself.
-    const front = pageTurn.querySelector(".page-front");
-    front.innerHTML = "";
+    const holder = pageTurn.querySelector(".page-card");
+    holder.innerHTML = "";
     const copy = cardEl.cloneNode(true);
-    copy.removeAttribute("id");
     copy.classList.remove("is-today");
     copy.setAttribute("tabindex", "-1");
-    front.appendChild(copy);
+    holder.appendChild(copy);
 
     Object.assign(pageTurn.style, {
       left: tl + "px", top: tt + "px", width: tw + "px", height: th + "px"
@@ -233,62 +243,123 @@
     cardEl.style.visibility = "hidden";
 
     const leaf = pageTurn.querySelector(".page-leaf");
-    const zoom = pageTurn.animate([
-      { transform: "translate(" + (r.left - tl) + "px," + (r.top - tt) + "px) scale(" + (r.width / tw) + ")" },
-      { transform: "translate(0,0) scale(1)" }
-    ], { duration: 520, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" });
+    const shade = pageTurn.querySelector(".page-shade");
+    const glow = pageTurn.querySelector(".page-glow");
+    const from = "translate(" + (r.left - tl) + "px," + (r.top - tt) + "px) scale(" + s0 + ")";
 
-    zoom.onfinish = () => {
-      const turn = leaf.animate([
-        { transform: "rotateY(0deg)" },
-        { transform: "rotateY(-12deg) translateZ(30px)", offset: 0.15 },
-        { transform: "rotateY(-178deg)" }
-      ], { duration: 850, easing: "cubic-bezier(.45,.05,.3,1)", fill: "both" });
-      const fade = pageTurn.animate([{ opacity: 1 }, { opacity: 1, offset: 0.65 }, { opacity: 0 }],
-        { duration: 850, fill: "both" });
-      setTimeout(onOpened, 380);
-      turn.onfinish = () => {
-        pageTurn.hidden = true;
-        zoom.cancel(); turn.cancel(); fade.cancel();
-        front.innerHTML = "";
-        cardEl.style.visibility = "";
-      };
+    const anims = [
+      // Lift and glide to the centre, settling with a soft overshoot.
+      pageTurn.animate([
+        { transform: from, opacity: 1 },
+        { transform: "translate(0,0) scale(1.035)", offset: 0.78 },
+        { transform: "translate(0,0) scale(1)" }
+      ], { duration: 620, easing: EASE_OUT, fill: "both" }),
+
+      // Cover swings open around its left edge.
+      leaf.animate([
+        { transform: "rotateY(0deg) translateZ(0)" },
+        { transform: "rotateY(-25deg) translateZ(24px)", offset: 0.25 },
+        { transform: "rotateY(-172deg) translateZ(0)" }
+      ], { duration: 900, delay: 480, easing: EASE_IN_OUT, fill: "both" }),
+
+      // The cover darkens as it turns away from the light...
+      shade.animate([{ opacity: 0 }, { opacity: 1 }],
+        { duration: 600, delay: 480, easing: "ease-in", fill: "both" }),
+
+      // ...while warm light spills out from inside.
+      glow.animate([
+        { opacity: 0, transform: "translate(-50%,-50%) scale(.6)" },
+        { opacity: 1, transform: "translate(-50%,-50%) scale(1.15)" }
+      ], { duration: 800, delay: 560, easing: EASE_OUT, fill: "both" }),
+
+      // Finally the open card grows slightly and dissolves into the scroll.
+      pageTurn.animate([
+        { opacity: 1, transform: "translate(0,0) scale(1)" },
+        { opacity: 0, transform: "translate(0,0) scale(1.12)" }
+      ], { duration: 420, delay: 1000, easing: EASE_IN_OUT, fill: "forwards", composite: "replace" })
+    ];
+
+    setTimeout(startScroll, 900);
+
+    return anims[anims.length - 1].finished.then(() => {
+      anims.forEach(a => a.cancel());
+      pageTurn.hidden = true;
+      holder.innerHTML = "";
+      cardEl.style.visibility = "";
+    });
+  }
+
+  // ---- Scroll motion (Web Animations, transform/clip only) ----------
+
+  function scrollParts(el) {
+    return {
+      paper: el.querySelector(".scroll-paper"),
+      top: el.querySelector(".scroll-rod--top"),
+      bottom: el.querySelector(".scroll-rod--bottom"),
+      half: el.getBoundingClientRect().height / 2 - 13   // rods meet in the middle
     };
   }
 
-  function showScroll(el) {
+  // Rods appear together in the middle, then glide apart as the paper
+  // unrolls; the writing fades in line by line once there's room for it.
+  function unroll(el) {
     el.hidden = false;
-    el.classList.remove("is-rolling-up", "is-unrolling");
     el.querySelector(".scroll-paper").scrollTop = 0;
-    void el.offsetWidth;
-    el.classList.add("is-unrolling");
-    const focusEl = el.querySelector(".scroll-close");
-    setTimeout(() => focusEl && focusEl.focus({ preventScroll: true }), 50);
+    if (reduceMotion()) return Promise.resolve();
+    const p = scrollParts(el);
+    const D = 950, DELAY = 140;
+    const opts = { duration: D, delay: DELAY, easing: EASE_OUT, fill: "backwards" };
+    const anims = [
+      el.animate([{ opacity: 0, transform: "scale(.94)" }, { opacity: 1, transform: "scale(1)" }],
+        { duration: 300, easing: EASE_OUT, fill: "backwards" }),
+      p.paper.animate([{ clipPath: "inset(50% 0 50% 0)" }, { clipPath: "inset(0% 0 0% 0)" }], opts),
+      p.top.animate([{ transform: "translateY(" + p.half + "px)" }, { transform: "translateY(0)" }], opts),
+      p.bottom.animate([{ transform: "translateY(" + (-p.half) + "px)" }, { transform: "translateY(0)" }], opts)
+    ];
+    // Stagger the writing in.
+    const items = el.querySelectorAll(
+      "#reading-body > *, #task-body > *, .scroll-inner > .btn-done, .scroll-inner > .btn-back");
+    items.forEach((n, i) => {
+      if (i > 12) return;
+      n.animate([{ opacity: 0, transform: "translateY(12px)" }, { opacity: 1, transform: "none" }],
+        { duration: 520, delay: DELAY + 380 + i * 55, easing: EASE_OUT, fill: "backwards" });
+    });
+    const closeBtn = el.querySelector(".scroll-close");
+    setTimeout(() => closeBtn && closeBtn.focus({ preventScroll: true }), DELAY + 400);
+    return anims[1].finished.catch(() => {});
   }
 
-  function hideScroll(el, done) {
-    if (el.hidden) { done && done(); return; }
-    if (reduceMotion()) { el.hidden = true; done && done(); return; }
-    el.classList.remove("is-unrolling");
-    el.classList.add("is-rolling-up");
-    setTimeout(() => {
+  // Paper rolls back up to the middle, rods meet, and it fades away.
+  function rollUp(el) {
+    if (el.hidden) return Promise.resolve();
+    if (reduceMotion()) { el.hidden = true; return Promise.resolve(); }
+    const p = scrollParts(el);
+    const opts = { duration: 480, easing: EASE_IN_OUT, fill: "forwards" };
+    const anims = [
+      p.paper.animate([{ clipPath: "inset(0% 0 0% 0)" }, { clipPath: "inset(50% 0 50% 0)" }], opts),
+      p.top.animate([{ transform: "translateY(0)" }, { transform: "translateY(" + p.half + "px)" }], opts),
+      p.bottom.animate([{ transform: "translateY(0)" }, { transform: "translateY(" + (-p.half) + "px)" }], opts),
+      el.animate([{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(.92)" }],
+        { duration: 220, delay: 420, easing: EASE_IN, fill: "forwards" })
+    ];
+    return anims[3].finished.catch(() => {}).then(() => {
       el.hidden = true;
-      el.classList.remove("is-rolling-up");
-      done && done();
-    }, 380);
+      anims.forEach(a => a.cancel());
+    });
   }
 
   function goToTask() {
+    if (busy) return;
     history.pushState({ advent: "task", day: state.activeDay }, "");
     historyDepth = 2;
     showTaskView();
   }
-  function showTaskView() {
-    hideScroll(scrollReading, () => showScroll(scrollTask));
+  function swap(from, to) {
+    busy = true;
+    rollUp(from).then(() => unroll(to)).then(() => { busy = false; });
   }
-  function showReadingView() {
-    hideScroll(scrollTask, () => showScroll(scrollReading));
-  }
+  function showTaskView() { swap(scrollReading, scrollTask); }
+  function showReadingView() { swap(scrollTask, scrollReading); }
 
   // Close buttons / backdrop: unwind the history entries we added, so the
   // phone's Back button and our close button behave the same way.
@@ -306,16 +377,18 @@
   function closeReader() {
     historyDepth = 0;
     const open = !scrollTask.hidden ? scrollTask : scrollReading;
-    hideScroll(open, () => {
-      reader.classList.remove("is-open");
+    // Start fading the backdrop while the paper is still rolling up.
+    setTimeout(() => reader.classList.remove("is-open"), 260);
+    rollUp(open).then(() => {
       setTimeout(() => {
         reader.hidden = true;
         scrollReading.hidden = true;
         scrollTask.hidden = true;
         lockScroll(false);
+        busy = false;
         const card = document.querySelector('.card[data-day="' + state.activeDay + '"]');
         if (card) card.focus({ preventScroll: true });
-      }, 200);
+      }, 250);
     });
   }
 
