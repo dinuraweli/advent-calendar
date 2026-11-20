@@ -1,47 +1,50 @@
 # Advent Calendar 🕯️
 
-A digital Advent calendar for Sunday school. Each day from **December 1–25**
-reveals a **scripture verse**, a short **reflection**, and a small **activity**,
-in **English, Sinhala, and Tamil**.
+A digital Advent calendar for Sunday school, built for phones. It runs from
+the **First Sunday of Advent (Sunday 29 November 2026) to Christmas Day** —
+27 days — in **English, Sinhala, and Tamil**.
 
-- Three separate pages: pick a language → a short intro → the **Nativity scene**.
-- The scene is a **progressive Nativity**: one new element appears each day
-  (sky → stable → Holy Family → shepherds → angels → star → wise men → the
-  Christ child on the 25th). Tap a day below to open its reading.
+- Pick a language → a short intro → the calendar.
+- A **progress bar** across the top marks the four Sundays of Advent with
+  candles (Hope, Peace, Joy, Love) and Christmas Day. Each candle lights up
+  when its Sunday arrives.
+- Days are grouped by week. Tapping a day plays a **page-opening** animation,
+  then a **parchment scroll** unrolls with the day's theme, scripture verse and
+  reflection. A button at the end opens a **second scroll** with the day's task,
+  where children can mark the day done with a ⭐.
 - **Future days stay locked** until their date (based on the phone's clock).
-- Mark a day done with a ⭐; progress and language are remembered on the device.
+- The phone's Back button closes the scroll, like a normal page.
 - Works **offline** after the first load and can be "added to home screen".
 
-No build step, no server, no accounts. Just static files — perfect for sharing a
-single link over WhatsApp.
+No build step, no server, no accounts. Just static files.
 
 ---
 
 ## ✍️ Editing the daily content
 
-All the day-by-day text lives in **`content.js`**. Open it in any text editor and
-replace the `[...]` placeholders. Each day has three languages (`en`, `si`, `ta`)
-and these fields:
+All the day-by-day text lives in **`content.js`**, one entry per day in date
+order. Each entry has:
 
-| Field        | What it is                                   |
-|--------------|----------------------------------------------|
-| `title`      | short theme shown on the day's reading        |
-| `verse`      | the scripture text                           |
-| `reference`  | e.g. `"Isaiah 9:6"`                          |
-| `reflection` | a short thought (2–4 sentences)              |
-| `activity`   | a small thing to do that day                 |
+| Field        | What it is                                              |
+|--------------|---------------------------------------------------------|
+| `date`       | `"MM-DD"` — the day unlocks on this date                |
+| `img`        | picture file in `assets/days/` (`""` for none)          |
+| `feast`      | optional saint's day / feast                            |
+| `title`      | the day's theme                                         |
+| `verse`      | the scripture text shown on the scroll                  |
+| `reference`  | e.g. `"Mark 13:33"`                                     |
+| `readings`   | optional: the day's full readings                       |
+| `reflection` | the reflection                                          |
+| `actTitle`   | optional heading for the day's task                     |
+| `activity`   | the task (lines starting `- ` become a bullet list)     |
 
-Keep the quotation marks, and don't change the `day`/`date` numbers.
+Week 1 comes from the Sunday school's reflections document. Weeks 2–4 are
+drafts to review. Sinhala and Tamil are still placeholders.
 
-> You can also delete the `buildDays()` generator and just write the 25-day
-> array out by hand if you prefer — whatever's easier to maintain.
+The app's buttons, candle names and intro pages are in **`js/i18n.js`**.
 
-The app's buttons and the intro/onboarding pages are in **`js/i18n.js`** if you
-ever want to reword them.
-
-**After editing:** if people have already added the app to their home screen,
-bump `CACHE_VERSION` in `sw.js` (e.g. `advent-v1` → `advent-v2`) so their phones
-pick up the new text.
+**After editing:** bump `CACHE_VERSION` in `sw.js` (e.g. `advent-v14` →
+`advent-v15`) so phones that have the app pick up the new text.
 
 ---
 
@@ -60,9 +63,9 @@ Then visit <http://localhost:8000>.
 ### Testing locked/unlocked days
 Add `?preview=YYYY-MM-DD` (or `?debug=`) to pretend it's a certain date:
 
-- <http://localhost:8000/?preview=2026-12-01> → only Day 1 open
-- <http://localhost:8000/?preview=2026-12-10> → Days 1–10 open, 11–25 locked
-- <http://localhost:8000/?preview=2026-12-25> → everything open, center candle lit
+- <http://localhost:8000/?preview=2026-11-29> → only the first day open
+- <http://localhost:8000/?preview=2026-12-20> → 29 Nov – 20 Dec open, four candles lit
+- <http://localhost:8000/?preview=2026-12-25> → everything open, Christmas candle lit
 
 To start fresh (clear language/intro/stars), open the browser console and run
 `localStorage.clear()`, or use **Settings → Reset progress / Show intro again**.

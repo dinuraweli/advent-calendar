@@ -1,172 +1,307 @@
 /* =====================================================================
-   ADVENT CALENDAR — DATE LOGIC + ILLUSTRATED CARD RENDERING
+   ADVENT CALENDAR — DATES, PROGRESS BAR, GRID AND SCROLL CONTENT
    ===================================================================== */
 
-// The year this calendar runs. Defaults to the current year so it works
-// again next December with no edits. To test or pin a year, set a number.
-const ADVENT_YEAR = new Date().getFullYear();
+// The content in content.js is written for Advent 2026, which begins on
+// Sunday 29 November. Change this (and the dates in content.js) for a
+// future year.
+const ADVENT_YEAR = 2026;
 
-// Per-day illustration files live in assets/days/ as day-01.jpg … day-25.jpg.
-// Drop new art in with that name and it appears automatically. Missing files
-// fall back to a gentle placeholder (handled via <img> onerror).
-function dayImage(day) {
-  return "assets/days/day-" + String(day).padStart(2, "0") + ".jpg";
+// Illustrations live in assets/days/. Each day in content.js names its
+// own image file (or none, which shows a gentle placeholder).
+function dayImage(entry) {
+  return entry && entry.img ? "assets/days/" + entry.img : "";
 }
 
 const AdventCal = (() => {
 
-  // ---- Date helpers -------------------------------------------------
+  const DAYS = () => ADVENT_CONTENT.days;
+  const total = () => DAYS().length;
 
-  // Returns "today" as a local date at midnight. Supports a debug
-  // override via ?preview=YYYY-MM-DD (or ?debug=) for testing and for
-  // showing reviewers how the calendar looks on a given day.
-  function getToday() {
-    const params = new URLSearchParams(location.search);
-    const debug = params.get("preview") || params.get("debug");
-    if (debug && /^\d{4}-\d{2}-\d{2}$/.test(debug)) {
-      const [y, m, d] = debug.split("-").map(Number);
-      return new Date(y, m - 1, d);
-    }
-    const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  }
+  // ---- Dates --------------------------------------------------------
 
-  // The preview date string if one is set in the URL, otherwise null.
+  // ?preview=YYYY-MM-DD (or ?debug=) pretends today is that date, for
+  // testing and for showing reviewers how a given day will look.
   function previewDate() {
     const params = new URLSearchParams(location.search);
     const v = params.get("preview") || params.get("debug");
     return v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null;
   }
 
-  function dayDate(day) {
-    return new Date(ADVENT_YEAR, 11, day); // month 11 = December
+  function getToday() {
+    const v = previewDate();
+    if (v) {
+      const [y, m, d] = v.split("-").map(Number);
+      return new Date(y, m - 1, d);
+    }
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
   }
 
-  // A day (1–25) is unlocked if today is on or after December <day>.
+  function entry(day) { return DAYS().find(x => x.day === day); }
+
+  // content.js stores dates as "MM-DD".
+  function dateOf(day) {
+    const [m, d] = entry(day).date.split("-").map(Number);
+    return new Date(ADVENT_YEAR, m - 1, d);
+  }
+
   function isUnlocked(day) {
-    return getToday().getTime() >= dayDate(day).getTime();
+    return getToday().getTime() >= dateOf(day).getTime();
   }
 
   function unlockedCount() {
-    let n = 0;
-    for (let d = 1; d <= 25; d++) if (isUnlocked(d)) n++;
-    return n;
+    return DAYS().filter(e => isUnlocked(e.day)).length;
   }
 
-  // The day number that is "today" within Advent, or null if we're
-  // outside Dec 1–25.
+  // The day number that is "today", or null outside the Advent season.
   function currentDay() {
-    const t = getToday();
-    if (t.getFullYear() === ADVENT_YEAR && t.getMonth() === 11) {
-      const d = t.getDate();
-      if (d >= 1 && d <= 25) return d;
-    }
-    return null;
+    const t = getToday().getTime();
+    const hit = DAYS().find(e => dateOf(e.day).getTime() === t);
+    return hit ? hit.day : null;
   }
 
-  // ---- Calendar grid of illustrated cards --------------------------
+  // ---- Seasons: the four Sundays + Christmas ------------------------
+
+  // Every Sunday in the list starts a new week of Advent; Christmas Day
+  // closes the season. Each gets a candle on the progress bar.
+  const CANDLES = ["hope", "peace", "joy", "love"];
+
+  function checkpoints() {
+    const list = [];
+    DAYS().forEach(e => {
+      if (dateOf(e.day).getDay() === 0 && list.length < 4) {
+        const key = CANDLES[list.length];
+        list.push({ day: e.day, key, week: list.length + 1 });
+      }
+    });
+    const last = DAYS()[DAYS().length - 1];
+    list.push({ day: last.day, key: "christ", week: 5 });
+    return list;
+  }
+
+  // Which week a day belongs to (1–4), or 5 for Christmas Day.
+  function weekOf(day) {
+    const cps = checkpoints();
+    if (day === cps[cps.length - 1].day) return cps[cps.length - 1];
+    let cur = cps[0];
+    cps.forEach(c => { if (c.key !== "christ" && day >= c.day) cur = c; });
+    return cur;
+  }
+
+  // ---- Labels -------------------------------------------------------
+
+  function dict() {
+    return ADVENT_I18N[document.body.dataset.lang] || ADVENT_I18N.en;
+  }
+
+  function shortDate(day) {
+    const d = dateOf(day);
+    return d.getDate() + " " + dict().monthsShort[d.getMonth()];
+  }
+
+  function longDate(day) {
+    const t = dict();
+    const d = dateOf(day);
+    return t.weekdays[d.getDay()] + ", " + d.getDate() + " " + t.months[d.getMonth()];
+  }
+
+  function content(day, lang) {
+    const e = entry(day);
+    return e[lang] || e.en;
+  }
+
+  // ---- Progress bar with candle checkpoints ------------------------
+
+  function candleSVG(key, lit) {
+    const body = {
+      hope: "#6b3fa0", peace: "#6b3fa0", joy: "#e07aa6", love: "#6b3fa0", christ: "#fbf7ee"
+    }[key];
+    const stroke = key === "christ" ? "#d8c9a6" : "rgba(0,0,0,.15)";
+    return (
+      '<svg viewBox="0 0 24 44" class="candle-svg" aria-hidden="true">' +
+        (lit
+          ? '<ellipse class="flame-glow" cx="12" cy="9" rx="9" ry="10" fill="#ffd36b" opacity=".35"/>' +
+            '<path class="flame" d="M12 2c3 4 4.5 6.5 4.5 9a4.5 4.5 0 0 1-9 0C7.5 8.5 9 6 12 2z" fill="#ffb627"/>' +
+            '<path d="M12 6.5c1.4 2 2 3.2 2 4.4a2 2 0 0 1-4 0c0-1.2.6-2.4 2-4.4z" fill="#fff3c4"/>'
+          : "") +
+        '<line x1="12" y1="15" x2="12" y2="18" stroke="#3a2a1a" stroke-width="1.4" stroke-linecap="round"/>' +
+        '<rect x="6" y="18" width="12" height="24" rx="2" fill="' + body + '" stroke="' + stroke + '"/>' +
+        '<rect x="8" y="20" width="2.5" height="18" rx="1.2" fill="#fff" opacity=".25"/>' +
+      "</svg>"
+    );
+  }
+
+  function renderProgress(el) {
+    const t = dict();
+    const n = total();
+    const today = getToday().getTime();
+    const first = dateOf(1).getTime();
+    const lastDay = dateOf(n).getTime();
+
+    // How far along the season we are (0 → 1).
+    let frac = 0;
+    if (today >= lastDay) frac = 1;
+    else if (today >= first) {
+      const idx = DAYS().filter(e => dateOf(e.day).getTime() <= today).length;
+      frac = (idx - 1) / (n - 1);
+    }
+
+    const cps = checkpoints();
+    el.innerHTML =
+      '<div class="prog-track" role="progressbar" aria-valuemin="0" aria-valuemax="' + n +
+        '" aria-valuenow="' + unlockedCount() + '" aria-label="' + esc(t.progressLabel) + '">' +
+        '<div class="prog-rail"></div>' +
+        '<div class="prog-fill" style="width:' + (frac * 100).toFixed(2) + '%"></div>' +
+        cps.map(c => {
+          const pos = (c.day - 1) / (n - 1) * 100;
+          const lit = isUnlocked(c.day);
+          return (
+            '<div class="prog-cp' + (lit ? " is-lit" : "") + " cp-" + c.key + '" style="left:' + pos.toFixed(2) + '%">' +
+              '<div class="cp-candle">' + candleSVG(c.key, lit) + "</div>" +
+              '<div class="cp-dot"></div>' +
+              '<div class="cp-label"><span class="cp-name">' + esc(t.candles[c.key]) + "</span>" +
+                '<span class="cp-date">' + esc(shortDate(c.day)) + "</span></div>" +
+            "</div>"
+          );
+        }).join("") +
+      "</div>";
+  }
+
+  // ---- Grid of day cards, grouped by week --------------------------
 
   function renderGrid(grid, { onOpenDay, onLockedDay, doneSet }) {
+    const t = dict();
     grid.innerHTML = "";
-    for (let d = 1; d <= 25; d++) {
-      grid.appendChild(makeCard(d, { onOpenDay, onLockedDay, doneSet }));
-    }
+    let lastWeek = null;
+    DAYS().forEach(e => {
+      const w = weekOf(e.day);
+      if (w.week !== lastWeek) {
+        lastWeek = w.week;
+        const h = document.createElement("div");
+        h.className = "week-head wk-" + w.key;
+        h.innerHTML =
+          '<span class="week-candle">' + candleSVG(w.key, isUnlocked(w.day)) + "</span>" +
+          '<span class="week-text"><span class="week-title">' + esc(t.weekTitles[w.week - 1]) + "</span>" +
+          '<span class="week-theme">' + esc(t.candles[w.key]) + "</span></span>";
+        grid.appendChild(h);
+      }
+      grid.appendChild(makeCard(e, { onOpenDay, onLockedDay, doneSet }));
+    });
   }
 
-  function makeCard(day, { onOpenDay, onLockedDay, doneSet }) {
+  function makeCard(e, { onOpenDay, onLockedDay, doneSet }) {
+    const day = e.day;
     const unlocked = isUnlocked(day);
     const isToday = currentDay() === day;
     const done = doneSet.has(day);
+    const d = dateOf(day);
+    const t = dict();
 
     const el = document.createElement("button");
     el.className = "card";
     el.dataset.day = day;
-    el.setAttribute("aria-label", "Day " + day);
-    if (unlocked) el.classList.add("is-unlocked"); else el.classList.add("is-locked");
+    el.setAttribute("aria-label", t.dayWord + " " + day + ", " + longDate(day));
+    el.classList.add(unlocked ? "is-unlocked" : "is-locked");
     if (isToday) el.classList.add("is-today");
     if (done) el.classList.add("is-done");
-    if (day === 25) el.classList.add("card--special");
+    if (d.getDay() === 0) el.classList.add("card--sunday");
+    if (day === total()) el.classList.add("card--special");
 
     if (unlocked) {
-      // Show the illustration (with a graceful placeholder fallback) + theme.
+      const img = dayImage(e);
       el.innerHTML =
         '<div class="card-art">' +
-          '<img class="card-img" loading="lazy" alt="" src="' + dayImage(day) + '" ' +
-            'onerror="this.closest(\'.card\').classList.add(\'noimg\')">' +
-          '<div class="card-ph"><span class="card-ph-num">' + day + '</span><span class="card-ph-mark">✦</span></div>' +
+          (img ? '<img class="card-img" loading="lazy" alt="" src="' + img + '" ' +
+            'onerror="this.closest(\'.card\').classList.add(\'noimg\')">' : "") +
+          '<div class="card-ph"><span class="card-ph-num">' + d.getDate() + '</span><span class="card-ph-mark">✦</span></div>' +
+          '<span class="card-date-chip">' + esc(shortDate(day)) + "</span>" +
           (done ? '<span class="card-badge">⭐</span>' : "") +
         "</div>" +
         '<div class="card-cap">' +
-          '<span class="card-day">' + dayLabel(day) + "</span>" +
-          '<span class="card-theme">' + esc(dayTitle(day)) + "</span>" +
+          '<span class="card-theme">' + esc(content(day, document.body.dataset.lang || "en").title) + "</span>" +
         "</div>";
+      if (!img) el.classList.add("noimg");
     } else {
-      // Locked: a "wrapped" cover — no art spoiler.
       el.innerHTML =
         '<div class="card-cover">' +
-          '<span class="card-cover-num">' + day + "</span>" +
+          '<span class="card-cover-num">' + d.getDate() + "</span>" +
+          '<span class="card-cover-month">' + esc(t.months[d.getMonth()]) + "</span>" +
           '<span class="card-cover-lock">🔒</span>' +
         "</div>";
     }
 
-    el.addEventListener("click", () => unlocked ? onOpenDay(day) : onLockedDay(day));
+    el.addEventListener("click", () => unlocked ? onOpenDay(day, el) : onLockedDay(day));
     return el;
   }
 
-  function dayLabel(day) {
-    return (window.ADVENT_I18N &&
-      ((ADVENT_I18N[document.body.dataset.lang] || ADVENT_I18N.en).dayWord)) ?
-      (ADVENT_I18N[document.body.dataset.lang] || ADVENT_I18N.en).dayWord + " " + day :
-      "Day " + day;
-  }
+  // ---- Scroll 1: theme, scripture, reflection -----------------------
 
-  // The day's theme title in the current language (for the card caption).
-  function dayTitle(day) {
-    const lang = document.body.dataset.lang || "en";
-    const data = ADVENT_CONTENT.days.find(x => x.day === day);
-    const c = data && (data[lang] || data.en);
-    return (c && c.title) || "";
-  }
-
-  // ---- Day card rendering (two steps) ------------------------------
-
-  // Step 1: illustration + scripture + reflection, with a button to reveal
-  // the activity. Step 2 (the activity) is included but hidden; app.js reveals it.
-  function renderDay(day, lang, t) {
-    const data = ADVENT_CONTENT.days.find(x => x.day === day);
-    const c = data[lang] || data.en;
-    const dateLabel = "December " + day;
+  function renderReading(day, lang) {
+    const t = dict();
+    const c = content(day, lang);
+    const e = entry(day);
+    const w = weekOf(day);
+    const img = dayImage(e);
     return (
-      '<div class="day-illus">' +
-        '<img class="day-illus-img" alt="" src="' + dayImage(day) + '" ' +
-          'onerror="this.closest(\'.day-illus\').classList.add(\'noimg\')">' +
-        '<div class="day-illus-ph"><span>' + day + "</span></div>" +
-      "</div>" +
-      '<div class="day-head">' +
-        '<span class="day-badge">' + t.dayWord + " " + day + "</span>" +
-        '<span class="day-date">' + dateLabel + "</span>" +
-      "</div>" +
-      (c.title ? '<h2 class="day-title">' + esc(c.title) + "</h2>" : "") +
-      section("📖", t.verseLabel,
-        '<blockquote class="verse">' + esc(c.verse) + "</blockquote>" +
-        '<cite class="verse-ref">' + esc(c.reference) + "</cite>") +
-      section("💭", t.reflectionLabel, '<p>' + esc(c.reflection) + "</p>") +
-      '<button class="btn-reveal" id="reveal-activity">' +
-        '<span class="sec-icon">✏️</span> ' + esc(t.revealActivity) +
-      "</button>" +
-      '<div class="day-activity" id="day-activity" hidden>' +
-        section("✏️", t.activityLabel, '<p>' + esc(c.activity) + "</p>") +
-      "</div>"
+      (img
+        ? '<figure class="rd-illus"><img alt="" src="' + img + '" onerror="this.parentNode.remove()"></figure>'
+        : "") +
+      '<p class="rd-kicker">' + esc(t.dayWord + " " + day) + " · " + esc(longDate(day)) + "</p>" +
+      '<p class="rd-week">' + candleSVG(w.key, true) +
+        "<span>" + esc(t.weekTitles[w.week - 1]) + " · " + esc(t.candles[w.key]) + "</span></p>" +
+      (c.feast ? '<p class="rd-feast">' + esc(c.feast) + "</p>" : "") +
+      '<h2 class="rd-title" id="reader-title">' + esc(c.title) + "</h2>" +
+      '<div class="rd-ornament" aria-hidden="true">✦ ✦ ✦</div>' +
+      '<section class="rd-section">' +
+        '<h3 class="rd-label">📖 ' + esc(t.verseLabel) + "</h3>" +
+        '<blockquote class="rd-verse">' + esc(c.verse) + "</blockquote>" +
+        '<cite class="rd-ref">' + esc(c.reference) + "</cite>" +
+        (c.readings ? '<p class="rd-readings"><strong>' + esc(t.readingsLabel) + ":</strong> " + esc(c.readings) + "</p>" : "") +
+      "</section>" +
+      '<section class="rd-section">' +
+        '<h3 class="rd-label">💭 ' + esc(t.reflectionLabel) + "</h3>" +
+        paragraphs(c.reflection) +
+      "</section>" +
+      '<button class="btn-scroll" id="to-task" type="button">' +
+        "<span>✏️</span> " + esc(t.viewTask) + " <span aria-hidden=\"true\">→</span></button>"
     );
   }
 
-  function section(icon, label, inner) {
+  // ---- Scroll 2: the day's task --------------------------------------
+
+  function renderTask(day, lang) {
+    const t = dict();
+    const c = content(day, lang);
     return (
-      '<div class="day-section">' +
-        '<h3 class="day-section-title"><span class="sec-icon">' + icon + "</span>" + label + "</h3>" +
-        inner +
-      "</div>"
+      '<p class="rd-kicker">' + esc(t.dayWord + " " + day) + " · " + esc(longDate(day)) + "</p>" +
+      '<div class="task-icon" aria-hidden="true">✏️</div>' +
+      '<h2 class="rd-title" id="task-title">' + esc(t.taskTitle) + "</h2>" +
+      '<p class="task-theme">' + esc(c.actTitle || c.title) + "</p>" +
+      '<div class="rd-ornament" aria-hidden="true">✦ ✦ ✦</div>' +
+      '<div class="task-body">' + paragraphs(c.activity) + "</div>"
     );
+  }
+
+  // Blank lines start a new paragraph; lines beginning "- " become a list.
+  function paragraphs(text) {
+    return String(text).split(/\n\s*\n/).map(block => {
+      let html = "", list = [], para = [];
+      const flushList = () => {
+        if (list.length) html += "<ul>" + list.map(li => "<li>" + esc(li) + "</li>").join("") + "</ul>";
+        list = [];
+      };
+      const flushPara = () => {
+        if (para.length) html += "<p>" + para.map(esc).join("<br>") + "</p>";
+        para = [];
+      };
+      block.trim().split("\n").forEach(l => {
+        if (/^\s*-\s+/.test(l)) { flushPara(); list.push(l.replace(/^\s*-\s+/, "")); }
+        else { flushList(); para.push(l); }
+      });
+      flushList(); flushPara();
+      return html;
+    }).join("");
   }
 
   function esc(s) {
@@ -175,7 +310,7 @@ const AdventCal = (() => {
   }
 
   return {
-    ADVENT_YEAR, getToday, previewDate, isUnlocked, unlockedCount, currentDay,
-    renderGrid, renderDay
+    ADVENT_YEAR, total, getToday, previewDate, isUnlocked, unlockedCount, currentDay,
+    shortDate, longDate, renderProgress, renderGrid, renderReading, renderTask
   };
 })();

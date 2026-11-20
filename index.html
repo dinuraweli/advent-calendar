@@ -58,20 +58,42 @@
         <button class="icon-btn" id="open-settings" aria-label="Settings">⚙️</button>
       </header>
       <p class="preview-banner" id="preview-banner" hidden></p>
+      <div class="advent-progress" id="advent-progress"></div>
       <p class="scene-progress" id="scene-progress"></p>
       <div class="day-grid" id="day-grid"><!-- illustrated day cards injected --></div>
     </section>
 
-    <!-- ============ Day card (overlay sheet) ============ -->
-    <div id="day-sheet" class="sheet" hidden>
-      <div class="sheet-backdrop" data-close-sheet></div>
-      <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="day-heading">
-        <div class="sheet-handle" aria-hidden="true"></div>
-        <button class="icon-btn sheet-close" data-close-sheet aria-label="Close">✕</button>
-        <div class="sheet-body" id="sheet-body"><!-- day content injected --></div>
-        <button class="btn-done" id="day-done-btn"><span class="star">☆</span> <span data-i18n="markDone">Mark as done</span></button>
-      </div>
+    <!-- ============ Day reader: two parchment scrolls ============ -->
+    <div id="reader" class="reader" hidden>
+      <div class="reader-backdrop" data-close-reader></div>
+
+      <!-- Scroll 1: theme, scripture, reflection -->
+      <article class="scroll" id="scroll-reading" role="dialog" aria-modal="true" aria-labelledby="reader-title" hidden>
+        <div class="scroll-rod scroll-rod--top" aria-hidden="true"></div>
+        <div class="scroll-paper">
+          <button class="scroll-close" data-close-reader aria-label="Close">✕</button>
+          <div class="scroll-inner" id="reading-body"></div>
+        </div>
+        <div class="scroll-rod scroll-rod--bottom" aria-hidden="true"></div>
+      </article>
+
+      <!-- Scroll 2: the day's task -->
+      <article class="scroll" id="scroll-task" role="dialog" aria-modal="true" aria-labelledby="task-title" hidden>
+        <div class="scroll-rod scroll-rod--top" aria-hidden="true"></div>
+        <div class="scroll-paper">
+          <button class="scroll-close" data-close-reader aria-label="Close">✕</button>
+          <div class="scroll-inner">
+            <div id="task-body"></div>
+            <button class="btn-done" id="day-done-btn" type="button"><span class="star">☆</span> <span class="done-label">Mark as done</span></button>
+            <button class="btn-back" id="back-to-reading" type="button">← <span data-i18n="backToReading">Back to the reading</span></button>
+          </div>
+        </div>
+        <div class="scroll-rod scroll-rod--bottom" aria-hidden="true"></div>
+      </article>
     </div>
+
+    <!-- Page-turn layer used for the "page opening" animation -->
+    <div id="page-turn" class="page-turn" hidden aria-hidden="true"><div class="page-leaf"><div class="page-front"></div><div class="page-back"></div></div></div>
 
     <!-- ============ Settings (overlay sheet) ============ -->
     <div id="settings-sheet" class="sheet" hidden>

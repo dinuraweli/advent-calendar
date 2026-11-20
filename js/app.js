@@ -50,6 +50,8 @@
     renderHome();
     renderPreviewBanner();
     show("calendar");
+    // Arriving back from a refresh with the reader open in history: tidy up.
+    if (history.state && history.state.advent) history.replaceState(null, "");
     const openDayParam = +qp.get("open");
     if (openDayParam && AdventCal.isUnlocked(openDayParam)) openDay(openDayParam);
   }
@@ -153,47 +155,149 @@
     route();
   }
 
-  // ---- Home: grid of illustrated day-cards -------------------------
+  // ---- Home: progress bar + grid of day cards ----------------------
   function renderHome() {
+    AdventCal.renderProgress(document.getElementById("advent-progress"));
     AdventCal.renderGrid(document.getElementById("day-grid"), {
       doneSet: state.done,
       onOpenDay: openDay,
       onLockedDay: lockedDay
     });
-    const maxDay = AdventCal.unlockedCount();
-    const prog = document.getElementById("scene-progress");
-    prog.textContent = maxDay > 0
-      ? t().dayProgress.replace("{n}", maxDay)
+    const n = AdventCal.unlockedCount();
+    document.getElementById("scene-progress").textContent = n > 0
+      ? t().dayProgress.replace("{n}", n).replace("{total}", AdventCal.total())
       : t().beforeStart;
   }
 
   function lockedDay(day) {
-    const msg = t().lockedToast.replace("{n}", day);
-    toast(msg);
+    toast(t().lockedToast.replace("{date}", AdventCal.longDate(day)));
   }
 
-  // ---- Day sheet ---------------------------------------------------
-  const daySheet = document.getElementById("day-sheet");
+  // ---- Reader: page-opening animation, then two scrolls ------------
+  const reader = document.getElementById("reader");
+  const scrollReading = document.getElementById("scroll-reading");
+  const scrollTask = document.getElementById("scroll-task");
+  const pageTurn = document.getElementById("page-turn");
   const settingsSheet = document.getElementById("settings-sheet");
+  const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let historyDepth = 0;   // how many history entries the reader has pushed
 
-  function openDay(day) {
+  function openDay(day, cardEl) {
     state.activeDay = day;
-    const body = document.getElementById("sheet-body");
-    body.innerHTML = AdventCal.renderDay(day, state.lang, t());
-    body.scrollTop = 0;
-    daySheet.querySelector(".sheet-panel").scrollTop = 0;
-    // Step 2: reveal the activity on demand.
-    const revealBtn = document.getElementById("reveal-activity");
-    if (revealBtn) {
-      revealBtn.addEventListener("click", () => {
-        const act = document.getElementById("day-activity");
-        act.hidden = false;
-        revealBtn.hidden = true;
-        act.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      });
-    }
+    document.getElementById("reading-body").innerHTML = AdventCal.renderReading(day, state.lang);
+    document.getElementById("task-body").innerHTML = AdventCal.renderTask(day, state.lang);
+    document.getElementById("to-task").addEventListener("click", goToTask);
     updateDoneBtn();
-    openSheet(daySheet);
+
+    history.pushState({ advent: "reading", day }, "");
+    historyDepth = 1;
+
+    lockScroll(true);
+    reader.hidden = false;
+    scrollTask.hidden = true;
+    requestAnimationFrame(() => reader.classList.add("is-open"));
+
+    if (cardEl && !reduceMotion()) {
+      playPageTurn(cardEl);
+      setTimeout(() => showScroll(scrollReading), 420);
+    } else {
+      showScroll(scrollReading);
+    }
+  }
+
+  // A page lifts off the tapped card and swings open like a book cover.
+  function playPageTurn(cardEl) {
+    const r = cardEl.getBoundingClientRect();
+    const img = cardEl.querySelector(".card-img");
+    const front = pageTurn.querySelector(".page-front");
+    front.style.backgroundImage = img && !cardEl.classList.contains("noimg")
+      ? 'url("' + img.getAttribute("src") + '")' : "";
+    front.dataset.date = cardEl.querySelector(".card-date-chip")
+      ? cardEl.querySelector(".card-date-chip").textContent : "";
+    Object.assign(pageTurn.style, {
+      left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px"
+    });
+    pageTurn.hidden = false;
+    pageTurn.classList.remove("is-turning");
+    void pageTurn.offsetWidth;            // restart the animation
+    pageTurn.classList.add("is-turning");
+    setTimeout(() => { pageTurn.hidden = true; pageTurn.classList.remove("is-turning"); }, 900);
+  }
+
+  function showScroll(el) {
+    el.hidden = false;
+    el.classList.remove("is-rolling-up", "is-unrolling");
+    el.querySelector(".scroll-paper").scrollTop = 0;
+    void el.offsetWidth;
+    el.classList.add("is-unrolling");
+    const focusEl = el.querySelector(".scroll-close");
+    setTimeout(() => focusEl && focusEl.focus({ preventScroll: true }), 50);
+  }
+
+  function hideScroll(el, done) {
+    if (el.hidden) { done && done(); return; }
+    if (reduceMotion()) { el.hidden = true; done && done(); return; }
+    el.classList.remove("is-unrolling");
+    el.classList.add("is-rolling-up");
+    setTimeout(() => {
+      el.hidden = true;
+      el.classList.remove("is-rolling-up");
+      done && done();
+    }, 380);
+  }
+
+  function goToTask() {
+    history.pushState({ advent: "task", day: state.activeDay }, "");
+    historyDepth = 2;
+    showTaskView();
+  }
+  function showTaskView() {
+    hideScroll(scrollReading, () => showScroll(scrollTask));
+  }
+  function showReadingView() {
+    hideScroll(scrollTask, () => showScroll(scrollReading));
+  }
+
+  // Close buttons / backdrop: unwind the history entries we added, so the
+  // phone's Back button and our ✕ behave the same way.
+  function requestClose() {
+    if (historyDepth > 0) {
+      history.go(-historyDepth);
+      // Fallback: if the browser skips our history entries, close anyway.
+      setTimeout(() => {
+        if (!reader.hidden && reader.classList.contains("is-open") &&
+            !(history.state && history.state.advent)) closeReader();
+      }, 700);
+    } else closeReader();
+  }
+
+  function closeReader() {
+    historyDepth = 0;
+    const open = !scrollTask.hidden ? scrollTask : scrollReading;
+    hideScroll(open, () => {
+      reader.classList.remove("is-open");
+      setTimeout(() => {
+        reader.hidden = true;
+        scrollReading.hidden = true;
+        scrollTask.hidden = true;
+        lockScroll(false);
+        const card = document.querySelector('.card[data-day="' + state.activeDay + '"]');
+        if (card) card.focus({ preventScroll: true });
+      }, 200);
+    });
+  }
+
+  window.addEventListener("popstate", e => {
+    if (reader.hidden) return;
+    const s = e.state && e.state.advent;
+    if (s === "task") { historyDepth = 2; showTaskView(); }
+    else if (s === "reading") { historyDepth = 1; showReadingView(); }
+    else closeReader();
+  });
+
+  function lockScroll(on) {
+    document.documentElement.classList.toggle("no-scroll", on);
+    document.body.classList.toggle("no-scroll", on);
   }
 
   function updateDoneBtn() {
@@ -202,28 +306,31 @@
     const done = state.done.has(state.activeDay);
     btn.classList.toggle("is-done", done);
     btn.querySelector(".star").textContent = done ? "⭐" : "☆";
-    btn.querySelector("[data-i18n='markDone']").textContent =
-      done ? dict.markedDone : dict.markDone;
+    btn.querySelector(".done-label").textContent = done ? dict.markedDone : dict.markDone;
   }
 
   function toggleDone() {
     const d = state.activeDay;
     if (state.done.has(d)) state.done.delete(d);
-    else state.done.add(d);
+    else {
+      state.done.add(d);
+      const btn = document.getElementById("day-done-btn");
+      btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop");
+    }
     saveDone();
     updateDoneBtn();
-    renderHome(); // reflect star on the day picker
+    renderHome();
   }
 
-  // ---- Sheets (generic open/close) ---------------------------------
+  // ---- Settings sheet ----------------------------------------------
   function openSheet(sheet) {
     sheet.hidden = false;
     requestAnimationFrame(() => sheet.classList.add("is-open"));
-    document.body.classList.add("no-scroll");
+    lockScroll(true);
   }
   function closeSheet(sheet) {
     sheet.classList.remove("is-open");
-    document.body.classList.remove("no-scroll");
+    lockScroll(false);
     setTimeout(() => { sheet.hidden = true; }, 250);
   }
 
@@ -266,10 +373,11 @@
     document.getElementById("onb-next").addEventListener("click", nextOnb);
     document.getElementById("onb-skip").addEventListener("click", finishOnb);
 
-    // Day sheet
+    // Reader
     document.getElementById("day-done-btn").addEventListener("click", toggleDone);
-    daySheet.querySelectorAll("[data-close-sheet]").forEach(el =>
-      el.addEventListener("click", () => closeSheet(daySheet)));
+    document.getElementById("back-to-reading").addEventListener("click", () => history.back());
+    reader.querySelectorAll("[data-close-reader]").forEach(el =>
+      el.addEventListener("click", requestClose));
 
     // Settings
     document.getElementById("open-settings").addEventListener("click", () => {
@@ -282,7 +390,12 @@
       b.addEventListener("click", () => {
         setLang(b.dataset.lang);
         renderHome();
-        if (!daySheet.hidden && state.activeDay) openDay(state.activeDay);
+        if (!reader.hidden && state.activeDay) {
+          document.getElementById("reading-body").innerHTML = AdventCal.renderReading(state.activeDay, state.lang);
+          document.getElementById("task-body").innerHTML = AdventCal.renderTask(state.activeDay, state.lang);
+          document.getElementById("to-task").addEventListener("click", goToTask);
+          updateDoneBtn();
+        }
       }));
     document.getElementById("reset-progress").addEventListener("click", resetProgress);
     document.getElementById("replay-intro").addEventListener("click", replayIntro);
@@ -290,7 +403,7 @@
     // Close sheets with Escape
     document.addEventListener("keydown", e => {
       if (e.key === "Escape") {
-        if (!daySheet.hidden) closeSheet(daySheet);
+        if (!reader.hidden) requestClose();
         if (!settingsSheet.hidden) closeSheet(settingsSheet);
       }
     });
