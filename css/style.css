@@ -58,7 +58,6 @@ html.no-scroll, body.no-scroll { overflow: hidden; overscroll-behavior: none; }
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(192,57,43,.25);
 }
 .btn-ghost {
   background: transparent;
@@ -100,7 +99,6 @@ html.no-scroll, body.no-scroll { overflow: hidden; overscroll-behavior: none; }
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0,0,0,.05);
   transition: transform .12s, border-color .2s;
 }
 .lang-btn:active { transform: scale(.97); }
@@ -161,11 +159,11 @@ body[data-lang="si"] .onb-title, body[data-lang="ta"] .onb-title { font-family: 
   overflow: hidden;
   cursor: pointer;
   background: var(--card);
-  box-shadow: 0 6px 18px rgba(0,0,0,.09);
-  transition: transform .14s, box-shadow .2s;
+  border: 1px solid var(--line);
+  transition: transform .14s;
   font-family: inherit;
 }
-.card.is-unlocked:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(0,0,0,.14); }
+.card.is-unlocked:hover { transform: translateY(-2px); }
 .card.is-unlocked:active { transform: scale(.98); }
 
 /* Illustration area (portrait 3:4) */
@@ -237,7 +235,6 @@ body[data-lang="ta"] .card.is-today::before { content: "இன்று"; }
   max-height: 88vh; overflow-y: auto;
   transform: scale(.9); opacity: 0;
   transition: transform .26s cubic-bezier(.2,.9,.3,1), opacity .2s ease;
-  box-shadow: 0 20px 60px rgba(0,0,0,.35);
 }
 .sheet.is-open .sheet-panel { transform: scale(1); opacity: 1; }
 .sheet-handle { display: none; } /* bottom-sheet grip not needed for a pop-up */
@@ -268,7 +265,6 @@ body[data-lang="ta"] .card.is-today::before { content: "இன்று"; }
   z-index: 60;
   opacity: 0;
   transition: opacity .25s, transform .25s;
-  box-shadow: 0 8px 24px rgba(0,0,0,.3);
   max-width: 88vw; text-align: center;
 }
 .toast.is-show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -297,7 +293,7 @@ body[data-lang="ta"] .card.is-today::before { content: "இன்று"; }
   padding: 14px 30px 4px;
   background: var(--card);
   border-radius: 18px;
-  box-shadow: 0 6px 18px rgba(0,0,0,.06);
+  border: 1px solid var(--line);
 }
 .prog-track { position: relative; height: 100px; }
 .prog-rail, .prog-fill {
@@ -371,54 +367,26 @@ body[data-lang="si"] .card-cover-month, body[data-lang="ta"] .card-cover-month {
 .card--sunday.is-locked .card-cover { background:
     repeating-linear-gradient(135deg, rgba(255,255,255,.04) 0 10px, rgba(0,0,0,.03) 10px 20px),
     linear-gradient(160deg, #6b3fa0, #432566); }
-.card--sunday.is-unlocked { box-shadow: 0 0 0 2px #b48ad8, 0 6px 18px rgba(0,0,0,.09); }
+.card--sunday.is-unlocked { border: 2px solid #b48ad8; }
 .card:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 
 /* ===================================================================
-   6) PAGE-OPENING ANIMATION  (timeline driven from app.js)
+   6) OPENING ANIMATION  (timeline driven from app.js)
+   The tapped card glides to the centre, then rolls itself up into the
+   scroll, which unrolls.
    =================================================================== */
 .page-turn {
   position: fixed; z-index: 70; pointer-events: none;
-  perspective: 1400px; transform-origin: center center;
+  transform-origin: center center;
   will-change: transform, opacity;
 }
-/* The inside of the card, revealed as its cover swings open */
-.page-inside {
+.page-card {
   position: absolute; inset: 0; border-radius: 14px; overflow: hidden;
-  background:
-    radial-gradient(ellipse at 50% 45%, #fffaf0 0%, #f8ebcb 45%, #ecd6a5 100%);
-  box-shadow: 0 18px 50px rgba(0,0,0,.45), inset 0 0 30px rgba(140,95,30,.25);
+  background: linear-gradient(90deg, #e6cf9c 0%, #f6e8c6 8%, #f9eed3 50%, #f6e8c6 92%, #e6cf9c 100%);
 }
-.page-glow {
-  position: absolute; left: 50%; top: 45%;
-  width: 160%; aspect-ratio: 1; transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(255,226,150,.95) 0%, rgba(255,214,120,.45) 30%, rgba(255,214,120,0) 62%);
-  opacity: 0; will-change: opacity, transform;
-}
-.page-leaf {
-  position: absolute; inset: 0;
-  transform-style: preserve-3d; transform-origin: left center;
-  will-change: transform;
-}
-.page-front, .page-back {
-  position: absolute; inset: 0; border-radius: 14px; overflow: hidden;
-  backface-visibility: hidden; -webkit-backface-visibility: hidden;
-}
-.page-front { background: #f3ecdc; box-shadow: 0 18px 50px rgba(0,0,0,.4); }
-.page-front .card { width: 100%; height: 100%; box-shadow: none; border-radius: 14px; transform: none !important; outline: none; }
-.page-front .card::before { display: none; }
-.page-front .card-art { flex: 1; aspect-ratio: auto; }
-/* Shading that darkens the cover as it turns away from the light */
-.page-shade {
-  position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(90deg, rgba(40,20,0,0) 0%, rgba(40,20,0,.15) 40%, rgba(40,20,0,.55) 100%);
-  opacity: 0; will-change: opacity;
-}
-.page-back {
-  transform: rotateY(180deg);
-  background: linear-gradient(90deg, #ead6aa, #f7ebcf 35%, #f0ddb4);
-  box-shadow: inset -10px 0 22px rgba(120,80,20,.28);
-}
+.page-card .card { width: 100%; height: 100%; box-shadow: none; border: none; border-radius: 14px; transform: none !important; outline: none; }
+.page-card .card::before { display: none; }
+.page-card .card-art { flex: 1; aspect-ratio: auto; }
 
 /* ===================================================================
    7) THE READER: PARCHMENT SCROLLS
@@ -494,7 +462,6 @@ body[data-lang="si"] .card-cover-month, body[data-lang="ta"] .card-cover-month {
   margin: 4px auto 16px; max-width: 300px;
   aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden;
   border: 4px solid #fff8e6;
-  box-shadow: 0 4px 14px rgba(90,60,20,.3);
 }
 .rd-illus img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .rd-kicker {
@@ -538,7 +505,6 @@ body[data-lang="si"] .rd-verse, body[data-lang="ta"] .rd-verse { font-family: in
   padding: 16px 18px; border: none; border-radius: 14px;
   background: linear-gradient(180deg, #2e7d55, #1b5e3f);
   color: #fff; font-family: inherit; font-size: 17px; font-weight: 800;
-  box-shadow: 0 6px 16px rgba(27,94,63,.35), inset 0 1px 0 rgba(255,255,255,.2);
   cursor: pointer;
 }
 .btn-scroll:active { transform: scale(.98); }
@@ -561,7 +527,6 @@ body[data-lang="si"] .rd-verse, body[data-lang="ta"] .rd-verse { font-family: in
   padding: 16px; font-size: 17px; font-weight: 800; font-family: inherit;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  box-shadow: 0 6px 16px rgba(27,94,63,.3);
 }
 .btn-done.is-done { background: var(--gold); color: #4a2f00; }
 .btn-done .star { font-size: 20px; }
@@ -626,4 +591,3 @@ body[data-lang="si"] .card-ph-month, body[data-lang="ta"] .card-ph-month { lette
 .card.is-pending .card-cover-num { color: #c2a86c; }
 .card.is-pending .card-cover-month { color: #b39a68; }
 .card--sunday.is-pending .card-cover { background: linear-gradient(170deg, #efe6f6, #e0d3ec); }
-.page-card { position: absolute; inset: 0; }

@@ -217,9 +217,9 @@
 
   // One continuous timeline (times in ms, each stage overlaps the next):
   //    0 – 620   the card lifts and glides to the centre of the screen
-  //  480 – 1380  its cover swings open like a book, light glowing inside
-  //  900         the scroll begins to unroll underneath
-  // 1000 – 1400  the opened card dissolves into the scroll
+  //  560 – 980   it rolls itself up: widening and flattening into the
+  //              scroll's rods as it fades
+  //  800         the rods appear right there and the scroll unrolls
   function playOpening(cardEl, startScroll) {
     const r = cardEl.getBoundingClientRect();
     const vw = window.innerWidth, vh = window.innerHeight;
@@ -227,7 +227,6 @@
     let th = tw * r.height / r.width;
     if (th > vh * 0.6) { th = vh * 0.6; tw = th * r.width / r.height; }
     const tl = (vw - tw) / 2, tt = (vh - th) / 2;
-    const s0 = r.width / tw;
 
     const holder = pageTurn.querySelector(".page-card");
     holder.innerHTML = "";
@@ -242,47 +241,31 @@
     pageTurn.hidden = false;
     cardEl.style.visibility = "hidden";
 
-    const leaf = pageTurn.querySelector(".page-leaf");
-    const shade = pageTurn.querySelector(".page-shade");
-    const glow = pageTurn.querySelector(".page-glow");
-    const from = "translate(" + (r.left - tl) + "px," + (r.top - tt) + "px) scale(" + s0 + ")";
+    // Size of the rolled-up scroll the card turns into.
+    const scrollW = Math.min(vw - 24, 520);
+    const sx = scrollW / tw, sy = 30 / th;
+    const from = "translate(" + (r.left - tl) + "px," + (r.top - tt) + "px) scale(" + (r.width / tw) + ")";
 
-    const anims = [
-      // Lift and glide to the centre, settling with a soft overshoot.
-      pageTurn.animate([
-        { transform: from, opacity: 1 },
-        { transform: "translate(0,0) scale(1.035)", offset: 0.78 },
-        { transform: "translate(0,0) scale(1)" }
-      ], { duration: 620, easing: EASE_OUT, fill: "both" }),
+    const zoom = pageTurn.animate([
+      { transform: from },
+      { transform: "translate(0,0) scale(1.03)", offset: 0.8 },
+      { transform: "translate(0,0) scale(1)" }
+    ], { duration: 620, easing: EASE_OUT, fill: "both" });
 
-      // Cover swings open around its left edge.
-      leaf.animate([
-        { transform: "rotateY(0deg) translateZ(0)" },
-        { transform: "rotateY(-25deg) translateZ(24px)", offset: 0.25 },
-        { transform: "rotateY(-172deg) translateZ(0)" }
-      ], { duration: 900, delay: 480, easing: EASE_IN_OUT, fill: "both" }),
+    const rollIn = pageTurn.animate([
+      { transform: "translate(0,0) scale(1,1)", opacity: 1 },
+      { transform: "translate(0,0) scale(" + (sx * 0.85) + "," + (sy * 2.2) + ")", opacity: 1, offset: 0.65 },
+      { transform: "translate(0,0) scale(" + sx + "," + sy + ")", opacity: 0 }
+    ], { duration: 420, delay: 560, easing: EASE_IN_OUT, fill: "forwards" });
 
-      // The cover darkens as it turns away from the light...
-      shade.animate([{ opacity: 0 }, { opacity: 1 }],
-        { duration: 600, delay: 480, easing: "ease-in", fill: "both" }),
+    // The card's picture and words fade as it rolls up.
+    const fadeInner = copy.animate([{ opacity: 1 }, { opacity: 0 }],
+      { duration: 260, delay: 560, easing: "ease-in", fill: "forwards" });
 
-      // ...while warm light spills out from inside.
-      glow.animate([
-        { opacity: 0, transform: "translate(-50%,-50%) scale(.6)" },
-        { opacity: 1, transform: "translate(-50%,-50%) scale(1.15)" }
-      ], { duration: 800, delay: 560, easing: EASE_OUT, fill: "both" }),
+    setTimeout(startScroll, 800);
 
-      // Finally the open card grows slightly and dissolves into the scroll.
-      pageTurn.animate([
-        { opacity: 1, transform: "translate(0,0) scale(1)" },
-        { opacity: 0, transform: "translate(0,0) scale(1.12)" }
-      ], { duration: 420, delay: 1000, easing: EASE_IN_OUT, fill: "forwards", composite: "replace" })
-    ];
-
-    setTimeout(startScroll, 900);
-
-    return anims[anims.length - 1].finished.then(() => {
-      anims.forEach(a => a.cancel());
+    return rollIn.finished.then(() => {
+      [zoom, rollIn, fadeInner].forEach(a => a.cancel());
       pageTurn.hidden = true;
       holder.innerHTML = "";
       cardEl.style.visibility = "";

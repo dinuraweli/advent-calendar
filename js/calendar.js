@@ -262,7 +262,7 @@ const AdventCal = (() => {
         paragraphs(c.reflection) +
       "</section>" +
       '<button class="btn-scroll" id="to-task" type="button">' +
-        "<span>" + esc(t.viewTask) + "</span>" + ICONS.arrow + "</button>"
+        esc(t.viewTask) + "</button>"
     );
   }
 
