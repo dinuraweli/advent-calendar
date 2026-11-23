@@ -144,7 +144,7 @@ body[data-lang="si"] .onb-title, body[data-lang="ta"] .onb-title { font-family: 
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
-  padding: 0 2px 40px;
+  padding: 0 2px 28px;
 }
 @media (min-width: 560px) { .day-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; } }
 @media (min-width: 760px) { .day-grid { grid-template-columns: repeat(4, 1fr); } }
@@ -464,25 +464,29 @@ body[data-lang="si"] .card-cover-month, body[data-lang="ta"] .card-cover-month {
   border: 4px solid #fff8e6;
 }
 .rd-illus img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Heading block: centred, with breathing room between each line.
+   Side margins keep the centred text clear of the close button. */
 .rd-kicker {
-  margin: 0 48px 6px 0; font-size: 12.5px; font-weight: 800;
-  letter-spacing: .1em; text-transform: uppercase; color: #9a6b22;
+  margin: 6px 40px 14px; text-align: center;
+  font-size: 12px; font-weight: 800; line-height: 1.5;
+  letter-spacing: .06em; text-transform: uppercase; color: #9a6b22;
 }
 body[data-lang="si"] .rd-kicker, body[data-lang="ta"] .rd-kicker { letter-spacing: 0; text-transform: none; }
+.rd-kicker span { display: block; }
+.rd-kicker-date { margin-top: 4px; }
 .rd-week {
-  display: inline-flex; align-items: center; gap: 6px;
-  margin: 0 0 10px; padding: 3px 10px 3px 6px;
-  border-radius: 999px; background: rgba(107,63,160,.1);
-  font-size: 12.5px; font-weight: 700; color: #5b3590;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  margin: 0 0 16px; padding: 0;
+  font-size: 13.5px; font-weight: 700; line-height: 1.5; color: #5b3590;
 }
 .rd-week .candle-svg { width: 10px; height: 20px; }
 .rd-title {
   font-family: var(--font-en); font-weight: 600;
-  font-size: clamp(25px, 7vw, 32px); line-height: 1.15;
-  color: #8e2a1e; margin: 0;
+  font-size: clamp(25px, 7vw, 32px); line-height: 1.25;
+  color: #8e2a1e; margin: 0; text-align: center;
 }
-body[data-lang="si"] .rd-title, body[data-lang="ta"] .rd-title { font-family: inherit; font-size: 24px; line-height: 1.35; }
-.rd-ornament { color: #c79a3e; letter-spacing: .6em; font-size: 12px; text-align: center; margin: 14px 0 6px; }
+body[data-lang="si"] .rd-title, body[data-lang="ta"] .rd-title { font-family: inherit; font-size: 24px; line-height: 1.5; }
+.rd-ornament { color: #c79a3e; letter-spacing: .6em; font-size: 12px; text-align: center; margin: 18px 0 8px; }
 .rd-section { margin: 18px 0 0; }
 .rd-label {
   font-size: 12.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
@@ -511,15 +515,8 @@ body[data-lang="si"] .rd-verse, body[data-lang="ta"] .rd-verse { font-family: in
 
 /* Task scroll */
 .task-icon { font-size: 44px; text-align: center; margin: 14px 0 4px; }
-#scroll-task .rd-title { text-align: center; }
-#scroll-task .rd-kicker { text-align: center; margin: 0 40px 0; }
-.task-theme { text-align: center; color: #5b3590; font-weight: 700; margin: 6px 0 0; }
-.task-body {
-  margin: 10px 0 20px; padding: 18px 18px 8px;
-  background: rgba(255,250,236,.75);
-  border: 1.5px dashed rgba(154,107,34,.5);
-  border-radius: 14px;
-}
+.task-theme { text-align: center; color: #5b3590; font-weight: 700; line-height: 1.5; margin: 12px 0 0; }
+.task-body { margin: 18px 0 20px; padding: 0; background: none; border: none; }
 .btn-done {
   width: 100%;
   background: var(--green); color: #fff;
@@ -539,7 +536,7 @@ body[data-lang="si"] .rd-verse, body[data-lang="ta"] .rd-verse { font-family: in
   padding: 10px 14px; cursor: pointer;
 }
 
-.rd-feast { margin: 0 0 6px; font-size: 14px; font-weight: 700; font-style: italic; color: #8e2a1e; }
+.rd-feast { margin: 0 0 12px; text-align: center; font-size: 14px; font-weight: 700; font-style: italic; line-height: 1.5; color: #8e2a1e; }
 .rd-readings { margin: 12px 0 0; font-size: 14px !important; line-height: 1.5 !important; color: #6b5532; }
 .task-body ul { margin: 0 0 12px; padding-left: 22px; }
 .task-body li { font-size: 17px; line-height: 1.6; margin-bottom: 6px; }
@@ -591,3 +588,18 @@ body[data-lang="si"] .card-ph-month, body[data-lang="ta"] .card-ph-month { lette
 .card.is-pending .card-cover-num { color: #c2a86c; }
 .card.is-pending .card-cover-month { color: #b39a68; }
 .card--sunday.is-pending .card-cover { background: linear-gradient(170deg, #efe6f6, #e0d3ec); }
+
+
+/* ===================================================================
+   9) CHURCH LOGO + COPYRIGHT
+   =================================================================== */
+.church-logo { width: 76px; height: auto; margin: 0 auto 10px; display: block; }
+.site-footer {
+  margin: 8px 0 calc(24px + env(safe-area-inset-bottom));
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  text-align: center; color: var(--muted);
+  font-size: 12.5px; line-height: 1.6;
+}
+.site-footer img { width: 40px; height: auto; display: block; margin: 0 auto 8px; opacity: .9; }
+.site-footer p { margin: 0; }

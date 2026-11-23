@@ -9,7 +9,7 @@
    Bump CACHE_VERSION on any release so old caches are purged on activate.
    ===================================================================== */
 
-const CACHE_VERSION = "advent-v18";
+const CACHE_VERSION = "advent-v19";
 
 const APP_SHELL = [
   "./",
@@ -21,7 +21,8 @@ const APP_SHELL = [
   "./js/app.js",
   "./manifest.webmanifest",
   "./assets/icons/icon-192.png",
-  "./assets/icons/icon-512.png"
+  "./assets/icons/icon-512.png",
+  "./assets/logo/st-marys-logo.png"
 ];
 
 self.addEventListener("install", event => {

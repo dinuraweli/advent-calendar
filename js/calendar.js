@@ -250,7 +250,7 @@ const AdventCal = (() => {
       (img
         ? '<figure class="rd-illus"><img alt="" src="' + img + '" onerror="this.parentNode.remove()"></figure>'
         : "") +
-      '<p class="rd-kicker">' + esc(t.dayWord + " " + day) + " · " + esc(longDate(day)) + "</p>" +
+      '<p class="rd-kicker"><span>' + esc(t.dayWord + " " + day) + '</span><span class="rd-kicker-date">' + esc(longDate(day)) + "</span></p>" +
       '<p class="rd-week">' + candleSVG(w.key, true) + "<span>" + esc(t.weekTitles[w.week - 1]) + "</span></p>" +
       (c.feast ? '<p class="rd-feast">' + esc(c.feast) + "</p>" : "") +
       '<h2 class="rd-title" id="reader-title">' + esc(c.title) + "</h2>" +
@@ -276,7 +276,7 @@ const AdventCal = (() => {
     const t = dict();
     const c = content(day, lang);
     return (
-      '<p class="rd-kicker">' + esc(t.dayWord + " " + day) + " · " + esc(longDate(day)) + "</p>" +
+      '<p class="rd-kicker"><span>' + esc(t.dayWord + " " + day) + '</span><span class="rd-kicker-date">' + esc(longDate(day)) + "</span></p>" +
       '<h2 class="rd-title" id="task-title">' + esc(t.taskTitle) + "</h2>" +
       (c.actTitle ? '<p class="task-theme">' + esc(c.actTitle) + "</p>" : "") +
       '<div class="rd-ornament" aria-hidden="true">✦ ✦ ✦</div>' +
