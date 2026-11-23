@@ -100,15 +100,19 @@ const AdventCal = (() => {
     return ADVENT_I18N[document.body.dataset.lang] || ADVENT_I18N.en;
   }
 
-  function shortDate(day) {
-    const d = dateOf(day);
-    return d.getDate() + " " + dict().monthsShort[d.getMonth()];
-  }
-
-  function longDate(day) {
+  // Each language can set its own date order in i18n.js, e.g. Sinhala
+  // writes "නොවැම්බර් 30 වන සඳුදා". {d} day, {m} month, {wd} weekday.
+  function fmt(pattern, day, months) {
     const t = dict();
     const d = dateOf(day);
-    return t.weekdays[d.getDay()] + ", " + d.getDate() + " " + t.months[d.getMonth()];
+    return pattern.replace("{d}", d.getDate()).replace("{m}", months[d.getMonth()])
+      .replace("{wd}", t.weekdays[d.getDay()]);
+  }
+  function shortDate(day) {
+    return fmt(dict().shortDateFmt || "{d} {m}", day, dict().monthsShort);
+  }
+  function longDate(day) {
+    return fmt(dict().longDateFmt || "{wd}, {d} {m}", day, dict().months);
   }
 
   // ---- Progress bar with candle checkpoints ------------------------

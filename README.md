@@ -37,13 +37,15 @@ Sunday school goes there. Each day is one entry:
 | `activity`   | Today's Act (lines starting `- ` become a bullet list)  |
 | `img`        | optional picture file in `assets/days/`                 |
 
-Only the First Week of Advent has text so far. Days without an entry still
+Sinhala text goes in the `SINHALA` list in the same file, with the same
+fields. Only the First Week of Advent has text so far, in English and
+Sinhala; Tamil readers see English until Tamil text is added. Days without an entry still
 appear on the calendar but can't be opened until their text is added.
 
 The app's buttons, candle names and intro pages are in **`js/i18n.js`**.
 
-**After editing:** bump `CACHE_VERSION` in `sw.js` (e.g. `advent-v17` →
-`advent-v18`) so phones that have the app pick up the new text.
+**After editing:** bump `CACHE_VERSION` in `sw.js` (e.g. `advent-v18` →
+`advent-v19`) so phones that have the app pick up the new text.
 
 ---
 

@@ -1,2 +1,5 @@
 .vercel/
 .DS_Store
+
+# Source documents from the Sunday school (not published)
+*.docx
