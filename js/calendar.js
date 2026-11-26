@@ -136,28 +136,27 @@ const AdventCal = (() => {
     );
   }
 
-  function renderProgress(el) {
+  // The bar fills with the reader's own progress: each day marked done
+  // moves it forward, and a Sunday candle lights once the fill reaches it.
+  function renderProgress(el, doneSet) {
     const t = dict();
     const n = total();
-    const today = getToday().getTime();
-    const first = dateOf(1).getTime();
-    const lastDay = dateOf(n).getTime();
+    const done = DAYS().filter(e => doneSet && doneSet.has(e.day)).length;
+    const frac = n ? done / n : 0;
+    const width = (frac * 100).toFixed(2) + "%";
 
-    let frac = 0;
-    if (today >= lastDay) frac = 1;
-    else if (today >= first) {
-      const idx = DAYS().filter(e => dateOf(e.day).getTime() <= today).length;
-      frac = (idx - 1) / (n - 1);
-    }
+    // Start from the previous width so the change animates.
+    const prev = el.querySelector(".prog-fill");
+    const startWidth = prev ? prev.style.width : width;
 
     el.innerHTML =
       '<div class="prog-track" role="progressbar" aria-valuemin="0" aria-valuemax="' + n +
-        '" aria-valuenow="' + unlockedCount() + '" aria-label="' + esc(t.progressLabel) + '">' +
+        '" aria-valuenow="' + done + '" aria-label="' + esc(t.progressLabel) + '">' +
         '<div class="prog-rail"></div>' +
-        '<div class="prog-fill" style="width:' + (frac * 100).toFixed(2) + '%"></div>' +
+        '<div class="prog-fill" style="width:' + startWidth + '"></div>' +
         checkpoints().map(c => {
           const pos = (c.day - 1) / (n - 1) * 100;
-          const lit = isUnlocked(c.day);
+          const lit = done > 0 && frac * 100 >= pos - 0.01;
           return (
             '<div class="prog-cp' + (lit ? " is-lit" : "") + " cp-" + c.key + '" style="left:' + pos.toFixed(2) + '%">' +
               '<div class="cp-candle">' + candleSVG(c.key, lit) + "</div>" +
@@ -167,6 +166,12 @@ const AdventCal = (() => {
           );
         }).join("") +
       "</div>";
+
+    if (startWidth !== width) {
+      const fill = el.querySelector(".prog-fill");
+      void fill.offsetWidth; // let the start width apply before animating
+      fill.style.width = width;
+    }
   }
 
   // ---- Grid of day cards, grouped by week --------------------------

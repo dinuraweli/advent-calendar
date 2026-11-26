@@ -22,6 +22,7 @@ const ENGLISH = [
   // ---------------- First Week of Advent ----------------
   {
     date: "11-29",
+    img: "day-01.jpg",
     title: "Stay Awake and Be Ready",
     reflection: "Jesus invites us to stay awake and be ready for His coming. This does not mean living in fear, but living each day with faith and love. Sometimes we become busy with our daily activities and forget God. Advent reminds us to make time for God and prepare our hearts for Jesus. Let us not wait until Christmas to change. Let us begin today.",
     actTitle: "Make Time for God",
@@ -29,6 +30,7 @@ const ENGLISH = [
   },
   {
     date: "11-30",
+    img: "day-02.jpg",
     feast: "Feast of St. Andrew, Apostle",
     title: "Come, Follow Me",
     readings: "Romans 10:9–18 | Matthew 4:18–22",
@@ -38,6 +40,7 @@ const ENGLISH = [
   },
   {
     date: "12-01",
+    img: "day-03.jpg",
     title: "See the World Through God’s Eyes",
     readings: "Isaiah 11:1–10 | Luke 10:21–24",
     reflection: "Isaiah speaks about a world filled with peace and justice. In the Gospel, Jesus reminds us that God reveals Himself to those who are humble. God looks at the heart. Have you ever thought about how God looks at you? He surely respects us no matter who we are. Advent invites us to be humble, respect everyone, and see the goodness in others.",
@@ -46,6 +49,7 @@ const ENGLISH = [
   },
   {
     date: "12-02",
+    img: "day-04.jpg",
     title: "Jesus = Compassion",
     readings: "Isaiah 25:6–10a | Matthew 15:29–37",
     reflection: "In the Gospel, Jesus sees the hungry crowd and feels compassion for them. He multiplies the food and feeds them. The miracle here is not the multiplication of bread but the compassion of Jesus. Compassion makes everything great. We do not need to have a lot to help others. Even a small act of compassion can make a difference.",
@@ -54,6 +58,7 @@ const ENGLISH = [
   },
   {
     date: "12-03",
+    img: "day-05.jpg",
     feast: "Memorial of St. Francis Xavier",
     title: "Build Your Life on a Strong Foundation",
     readings: "Isaiah 26:1–6 | Matthew 7:21, 24–27",
@@ -63,6 +68,7 @@ const ENGLISH = [
   },
   {
     date: "12-04",
+    img: "day-06.jpg",
     title: "Lord, Open My Eyes",
     readings: "Isaiah 29:17–24 | Matthew 9:27–31",
     reflection: "In today’s Gospel, Jesus gives sight to two blind men who come to Him with faith. Sometimes we fail to notice the people around us who need our help, love, and attention. We may be too busy with our own lives to see their struggles. Advent invites us to open our eyes and become more caring and thoughtful towards others. Let us learn to notice the needs of those around us and respond with love.",
@@ -71,6 +77,7 @@ const ENGLISH = [
   },
   {
     date: "12-05",
+    img: "day-07.jpg",
     title: "Freely You Have Received, Freely Give",
     readings: "Isaiah 30:19–21, 23–26 | Matthew 9:35–10:1, 5a, 6–8",
     reflection: "Jesus looks at the people with love and compassion and sends His disciples to help them. He reminds them to give freely what they have freely received. Everything we have is a gift from God. Our talents, time and blessings are meant to be shared with others. We are called to spread God’s love through our actions.",

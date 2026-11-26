@@ -109,10 +109,26 @@ html.no-scroll, body.no-scroll { overflow: hidden; overscroll-behavior: none; }
 /* ===================================================================
    2) ONBOARDING / INTRO
    =================================================================== */
-#screen-onboarding { overflow: hidden; }
-.onb { display: flex; flex-direction: column; flex: 1; width: 100%; max-width: 440px; margin: 0 auto; padding: 24px 8px; }
-.onb-slides { flex: 1; display: flex; transition: transform .35s ease; align-items: center; }
-.onb-slide { min-width: 100%; text-align: center; padding: 0 12px; }
+/* Fit the intro exactly to the visible screen (svh = height with the
+   browser's toolbars showing), so Skip / Next never fall below the fold. */
+#screen-onboarding {
+  overflow: hidden;
+  height: 100vh;
+  height: 100svh;
+  min-height: 0;
+}
+/* overflow:hidden with no side padding clips the slides exactly at the
+   edge, so the next slide's text can't peek in from the side. */
+.onb {
+  display: flex; flex-direction: column; flex: 1; min-height: 0;
+  width: 100%; max-width: 440px; margin: 0 auto;
+  padding: 24px 0 20px;
+  overflow: hidden;
+}
+.onb-slides { flex: 1; min-height: 0; display: flex; transition: transform .35s ease; align-items: center; }
+.onb-slide { min-width: 100%; text-align: center; padding: 0 20px; }
+.onb-actions { padding: 0 8px; gap: 12px; }
+.onb-actions button { padding-left: 20px; padding-right: 20px; }
 .onb-art { font-size: 72px; margin-bottom: 20px; }
 .onb-title { font-family: var(--font-en); font-weight: 600; font-size: 27px; margin: 0 0 14px; color: var(--green); }
 body[data-lang="si"] .onb-title, body[data-lang="ta"] .onb-title { font-family: inherit; }

@@ -158,7 +158,7 @@
 
   // ---- Home: progress bar + grid of day cards ----------------------
   function renderHome() {
-    AdventCal.renderProgress(document.getElementById("advent-progress"));
+    AdventCal.renderProgress(document.getElementById("advent-progress"), state.done);
     AdventCal.renderGrid(document.getElementById("day-grid"), {
       doneSet: state.done,
       onOpenDay: openDay,
