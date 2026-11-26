@@ -2,6 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!-- When served from a sub-folder (e.g. /advent-calendar), make sure the
+       address ends in "/" so the relative file paths below resolve. -->
+  <script>
+    if (!/\/$|\.[a-z0-9]+$/i.test(location.pathname)) {
+      location.replace(location.pathname + "/" + location.search + location.hash);
+    }
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0f3d2e" />
   <title>Advent Calendar</title>
