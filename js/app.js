@@ -9,6 +9,17 @@
     done: "advent.done"
   };
 
+  // ?reset=1 starts over like a first-time visitor: forget the language,
+  // the intro and the stars, then drop "reset" from the address so a
+  // refresh doesn't wipe progress again (other options like ?preview stay).
+  (() => {
+    const url = new URL(location.href);
+    if (!url.searchParams.has("reset")) return;
+    try { Object.values(STORE).forEach(k => localStorage.removeItem(k)); } catch (e) {}
+    url.searchParams.delete("reset");
+    history.replaceState(null, "", url.pathname + url.search + url.hash);
+  })();
+
   // ---- State -------------------------------------------------------
   const state = {
     lang: localStorage.getItem(STORE.lang) || null,

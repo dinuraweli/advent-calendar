@@ -68,8 +68,10 @@ Add `?preview=YYYY-MM-DD` (or `?debug=`) to pretend it's a certain date:
 - <http://localhost:8000/?preview=2026-12-20> → 29 Nov – 20 Dec open, four candles lit
 - <http://localhost:8000/?preview=2026-12-25> → everything open, Christmas candle lit
 
-To start fresh (clear language/intro/stars), open the browser console and run
-`localStorage.clear()`, or use **Settings → Reset progress / Show intro again**.
+To start fresh like a first-time visitor (language picker, intro, no stars),
+add `reset=1` to the link, e.g. <http://localhost:8000/?preview=2026-12-25&reset=1>.
+It forgets what the phone remembered once, then removes itself from the
+address so refreshing doesn't wipe progress again.
 
 ---
 
