@@ -79,7 +79,8 @@
     // Fill any element with data-i18n
     document.querySelectorAll("[data-i18n]").forEach(el => {
       const key = el.getAttribute("data-i18n");
-      if (dict[key]) el.textContent = dict[key];
+      // An empty string (e.g. "The" in Sinhala/Tamil) hides the element.
+      if (key in dict) { el.textContent = dict[key]; el.hidden = !dict[key]; }
     });
     // Reflect in settings segmented control
     syncLangSegments();
