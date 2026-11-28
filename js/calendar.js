@@ -108,6 +108,11 @@ const AdventCal = (() => {
     return pattern.replace("{d}", d.getDate()).replace("{m}", months[d.getMonth()])
       .replace("{wd}", t.weekdays[d.getDay()]);
   }
+  // "Day 1" in English; a language can set dayFmt, e.g. Sinhala "{n} වන දිනය".
+  function dayLabel(day) {
+    const t = dict();
+    return (t.dayFmt || t.dayWord + " {n}").replace("{n}", day);
+  }
   function shortDate(day) {
     return fmt(dict().shortDateFmt || "{d} {m}", day, dict().monthsShort);
   }
@@ -207,7 +212,7 @@ const AdventCal = (() => {
     const el = document.createElement("button");
     el.className = "card";
     el.dataset.day = day;
-    el.setAttribute("aria-label", t.dayWord + " " + day + ", " + longDate(day));
+    el.setAttribute("aria-label", dayLabel(day) + ", " + longDate(day));
     el.classList.add(unlocked ? "is-unlocked" : "is-locked");
     if (isToday) el.classList.add("is-today");
     if (done) el.classList.add("is-done");
@@ -255,7 +260,7 @@ const AdventCal = (() => {
       (img
         ? '<figure class="rd-illus"><img alt="" src="' + img + '" onerror="this.parentNode.remove()"></figure>'
         : "") +
-      '<p class="rd-kicker"><span>' + esc(t.dayWord + " " + day) + '</span><span class="rd-kicker-date">' + esc(longDate(day)) + "</span></p>" +
+      '<p class="rd-kicker"><span>' + esc(dayLabel(day)) + '</span><span class="rd-kicker-date">' + esc(longDate(day)) + "</span></p>" +
       '<p class="rd-week">' + candleSVG(w.key, true) + "<span>" + esc(t.weekTitles[w.week - 1]) + "</span></p>" +
       (c.feast ? '<p class="rd-feast">' + esc(c.feast) + "</p>" : "") +
       '<h2 class="rd-title" id="reader-title">' + esc(c.title) + "</h2>" +
@@ -281,7 +286,7 @@ const AdventCal = (() => {
     const t = dict();
     const c = content(day, lang);
     return (
-      '<p class="rd-kicker"><span>' + esc(t.dayWord + " " + day) + '</span><span class="rd-kicker-date">' + esc(longDate(day)) + "</span></p>" +
+      '<p class="rd-kicker"><span>' + esc(dayLabel(day)) + '</span><span class="rd-kicker-date">' + esc(longDate(day)) + "</span></p>" +
       '<h2 class="rd-title" id="task-title">' + esc(t.taskTitle) + "</h2>" +
       (c.actTitle ? '<p class="task-theme">' + esc(c.actTitle) + "</p>" : "") +
       '<div class="rd-ornament" aria-hidden="true">✦ ✦ ✦</div>' +

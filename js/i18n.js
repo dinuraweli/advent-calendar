@@ -84,6 +84,7 @@ window.ADVENT_I18N = {
     backToReading: "කියවීමට ආපසු",
     close: "වසන්න",
     dayWord: "දිනය",
+    dayFmt: "{n} වන දිනය",
     longDateFmt: "{m} {d} වන {wd}",
     shortDateFmt: "{m} {d}",
     lockedToast: "මෙම දිනය {date} විවෘත වේ",
