@@ -9,6 +9,17 @@
     done: "advent.done"
   };
 
+  // ?reset=1 starts over like a first-time visitor: forget the language,
+  // the intro and the stars, then drop "reset" from the address so a
+  // refresh doesn't wipe progress again (other options like ?preview stay).
+  (() => {
+    const url = new URL(location.href);
+    if (!url.searchParams.has("reset")) return;
+    try { Object.values(STORE).forEach(k => localStorage.removeItem(k)); } catch (e) {}
+    url.searchParams.delete("reset");
+    history.replaceState(null, "", url.pathname + url.search + url.hash);
+  })();
+
   // ---- State -------------------------------------------------------
   const state = {
     lang: localStorage.getItem(STORE.lang) || null,
@@ -79,7 +90,8 @@
     // Fill any element with data-i18n
     document.querySelectorAll("[data-i18n]").forEach(el => {
       const key = el.getAttribute("data-i18n");
-      if (dict[key]) el.textContent = dict[key];
+      // An empty string (e.g. "The" in Sinhala/Tamil) hides the element.
+      if (key in dict) { el.textContent = dict[key]; el.hidden = !dict[key]; }
     });
     // Reflect in settings segmented control
     syncLangSegments();
@@ -158,7 +170,7 @@
 
   // ---- Home: progress bar + grid of day cards ----------------------
   function renderHome() {
-    AdventCal.renderProgress(document.getElementById("advent-progress"));
+    AdventCal.renderProgress(document.getElementById("advent-progress"), state.done);
     AdventCal.renderGrid(document.getElementById("day-grid"), {
       doneSet: state.done,
       onOpenDay: openDay,

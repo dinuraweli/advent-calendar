@@ -108,6 +108,11 @@ const AdventCal = (() => {
     return pattern.replace("{d}", d.getDate()).replace("{m}", months[d.getMonth()])
       .replace("{wd}", t.weekdays[d.getDay()]);
   }
+  // "Day 1" in English; a language can set dayFmt, e.g. Sinhala "{n} වන දිනය".
+  function dayLabel(day) {
+    const t = dict();
+    return (t.dayFmt || t.dayWord + " {n}").replace("{n}", day);
+  }
   function shortDate(day) {
     return fmt(dict().shortDateFmt || "{d} {m}", day, dict().monthsShort);
   }
@@ -136,28 +141,27 @@ const AdventCal = (() => {
     );
   }
 
-  function renderProgress(el) {
+  // The bar fills with the reader's own progress: each day marked done
+  // moves it forward, and a Sunday candle lights once the fill reaches it.
+  function renderProgress(el, doneSet) {
     const t = dict();
     const n = total();
-    const today = getToday().getTime();
-    const first = dateOf(1).getTime();
-    const lastDay = dateOf(n).getTime();
+    const done = DAYS().filter(e => doneSet && doneSet.has(e.day)).length;
+    const frac = n ? done / n : 0;
+    const width = (frac * 100).toFixed(2) + "%";
 
-    let frac = 0;
-    if (today >= lastDay) frac = 1;
-    else if (today >= first) {
-      const idx = DAYS().filter(e => dateOf(e.day).getTime() <= today).length;
-      frac = (idx - 1) / (n - 1);
-    }
+    // Start from the previous width so the change animates.
+    const prev = el.querySelector(".prog-fill");
+    const startWidth = prev ? prev.style.width : width;
 
     el.innerHTML =
       '<div class="prog-track" role="progressbar" aria-valuemin="0" aria-valuemax="' + n +
-        '" aria-valuenow="' + unlockedCount() + '" aria-label="' + esc(t.progressLabel) + '">' +
+        '" aria-valuenow="' + done + '" aria-label="' + esc(t.progressLabel) + '">' +
         '<div class="prog-rail"></div>' +
-        '<div class="prog-fill" style="width:' + (frac * 100).toFixed(2) + '%"></div>' +
+        '<div class="prog-fill" style="width:' + startWidth + '"></div>' +
         checkpoints().map(c => {
           const pos = (c.day - 1) / (n - 1) * 100;
-          const lit = isUnlocked(c.day);
+          const lit = done > 0 && frac * 100 >= pos - 0.01;
           return (
             '<div class="prog-cp' + (lit ? " is-lit" : "") + " cp-" + c.key + '" style="left:' + pos.toFixed(2) + '%">' +
               '<div class="cp-candle">' + candleSVG(c.key, lit) + "</div>" +
@@ -167,6 +171,12 @@ const AdventCal = (() => {
           );
         }).join("") +
       "</div>";
+
+    if (startWidth !== width) {
+      const fill = el.querySelector(".prog-fill");
+      void fill.offsetWidth; // let the start width apply before animating
+      fill.style.width = width;
+    }
   }
 
   // ---- Grid of day cards, grouped by week --------------------------
@@ -202,7 +212,7 @@ const AdventCal = (() => {
     const el = document.createElement("button");
     el.className = "card";
     el.dataset.day = day;
-    el.setAttribute("aria-label", t.dayWord + " " + day + ", " + longDate(day));
+    el.setAttribute("aria-label", dayLabel(day) + ", " + longDate(day));
     el.classList.add(unlocked ? "is-unlocked" : "is-locked");
     if (isToday) el.classList.add("is-today");
     if (done) el.classList.add("is-done");
@@ -250,7 +260,7 @@ const AdventCal = (() => {
       (img
         ? '<figure class="rd-illus"><img alt="" src="' + img + '" onerror="this.parentNode.remove()"></figure>'
         : "") +
-      '<p class="rd-kicker"><span>' + esc(t.dayWord + " " + day) + '</span><span class="rd-kicker-date">' + esc(longDate(day)) + "</span></p>" +
+      '<p class="rd-kicker"><span>' + esc(dayLabel(day)) + '</span><span class="rd-kicker-date">' + esc(longDate(day)) + "</span></p>" +
       '<p class="rd-week">' + candleSVG(w.key, true) + "<span>" + esc(t.weekTitles[w.week - 1]) + "</span></p>" +
       (c.feast ? '<p class="rd-feast">' + esc(c.feast) + "</p>" : "") +
       '<h2 class="rd-title" id="reader-title">' + esc(c.title) + "</h2>" +
@@ -276,7 +286,7 @@ const AdventCal = (() => {
     const t = dict();
     const c = content(day, lang);
     return (
-      '<p class="rd-kicker"><span>' + esc(t.dayWord + " " + day) + '</span><span class="rd-kicker-date">' + esc(longDate(day)) + "</span></p>" +
+      '<p class="rd-kicker"><span>' + esc(dayLabel(day)) + '</span><span class="rd-kicker-date">' + esc(longDate(day)) + "</span></p>" +
       '<h2 class="rd-title" id="task-title">' + esc(t.taskTitle) + "</h2>" +
       (c.actTitle ? '<p class="task-theme">' + esc(c.actTitle) + "</p>" : "") +
       '<div class="rd-ornament" aria-hidden="true">✦ ✦ ✦</div>' +

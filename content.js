@@ -22,6 +22,7 @@ const ENGLISH = [
   // ---------------- First Week of Advent ----------------
   {
     date: "11-29",
+    img: "day-01.jpg",
     title: "Stay Awake and Be Ready",
     reflection: "Jesus invites us to stay awake and be ready for His coming. This does not mean living in fear, but living each day with faith and love. Sometimes we become busy with our daily activities and forget God. Advent reminds us to make time for God and prepare our hearts for Jesus. Let us not wait until Christmas to change. Let us begin today.",
     actTitle: "Make Time for God",
@@ -29,6 +30,7 @@ const ENGLISH = [
   },
   {
     date: "11-30",
+    img: "day-02.jpg",
     feast: "Feast of St. Andrew, Apostle",
     title: "Come, Follow Me",
     readings: "Romans 10:9–18 | Matthew 4:18–22",
@@ -38,6 +40,7 @@ const ENGLISH = [
   },
   {
     date: "12-01",
+    img: "day-03.jpg",
     title: "See the World Through God’s Eyes",
     readings: "Isaiah 11:1–10 | Luke 10:21–24",
     reflection: "Isaiah speaks about a world filled with peace and justice. In the Gospel, Jesus reminds us that God reveals Himself to those who are humble. God looks at the heart. Have you ever thought about how God looks at you? He surely respects us no matter who we are. Advent invites us to be humble, respect everyone, and see the goodness in others.",
@@ -46,6 +49,7 @@ const ENGLISH = [
   },
   {
     date: "12-02",
+    img: "day-04.jpg",
     title: "Jesus = Compassion",
     readings: "Isaiah 25:6–10a | Matthew 15:29–37",
     reflection: "In the Gospel, Jesus sees the hungry crowd and feels compassion for them. He multiplies the food and feeds them. The miracle here is not the multiplication of bread but the compassion of Jesus. Compassion makes everything great. We do not need to have a lot to help others. Even a small act of compassion can make a difference.",
@@ -54,6 +58,7 @@ const ENGLISH = [
   },
   {
     date: "12-03",
+    img: "day-05.jpg",
     feast: "Memorial of St. Francis Xavier",
     title: "Build Your Life on a Strong Foundation",
     readings: "Isaiah 26:1–6 | Matthew 7:21, 24–27",
@@ -63,6 +68,7 @@ const ENGLISH = [
   },
   {
     date: "12-04",
+    img: "day-06.jpg",
     title: "Lord, Open My Eyes",
     readings: "Isaiah 29:17–24 | Matthew 9:27–31",
     reflection: "In today’s Gospel, Jesus gives sight to two blind men who come to Him with faith. Sometimes we fail to notice the people around us who need our help, love, and attention. We may be too busy with our own lives to see their struggles. Advent invites us to open our eyes and become more caring and thoughtful towards others. Let us learn to notice the needs of those around us and respond with love.",
@@ -71,6 +77,7 @@ const ENGLISH = [
   },
   {
     date: "12-05",
+    img: "day-07.jpg",
     title: "Freely You Have Received, Freely Give",
     readings: "Isaiah 30:19–21, 23–26 | Matthew 9:35–10:1, 5a, 6–8",
     reflection: "Jesus looks at the people with love and compassion and sends His disciples to help them. He reminds them to give freely what they have freely received. Everything we have is a gift from God. Our talents, time and blessings are meant to be shared with others. We are called to spread God’s love through our actions.",
@@ -141,11 +148,74 @@ const SINHALA = [
   }
 ];
 
+// Tamil (தமிழ்) — same fields, from "திருவருகைக் காலத்தின் முதல் வாரம்".
+const TAMIL = [
+  // ---------------- திருவருகைக் காலத்தின் முதல் வாரம் ----------------
+  {
+    date: "11-29",
+    title: "விழிப்பாயிருந்து தயாராக இருங்கள்",
+    reflection: "இயேசுவின் வருகைக்காக நாம் விழிப்பாயிருந்து தயாராக இருக்க வேண்டும் என்று இயேசு நமக்கு அழைப்பு விடுக்கிறார். இது பயத்துடன் வாழ வேண்டும் என்பதைக் குறிக்கவில்லை. மாறாக, ஒவ்வொரு நாளும் விசுவாசத்துடனும் அன்புடனும் வாழ வேண்டும் என்பதையே குறிக்கிறது.\n\nசில நேரங்களில் நமது அன்றாட வேலைகளிலும் பொறுப்புகளிலும் மூழ்கி, இறைவனை மறந்து விடுகிறோம். திருவருகைக் காலம் இறைவனுக்காக நேரத்தை ஒதுக்கவும், இயேசுவை வரவேற்க நமது இதயங்களைத் தயார்படுத்தவும் நமக்கு நினைவூட்டுகிறது.\n\nகிறிஸ்துமஸ் வரும் வரை நமது வாழ்க்கையில் மாற்றத்தை ஏற்படுத்தக் காத்திருக்க வேண்டாம். அந்த மாற்றத்தை இன்றே ஆரம்பிப்போம்.",
+    actTitle: "இறைவனுக்காக நேரத்தை ஒதுக்குவோம்",
+    activity: "இன்று குறைந்தது 15 நிமிடங்களாவது தனிமையில் இறைவனுடன் செபத்தில் செலவிடுங்கள். உங்களை இறைவனிடமிருந்து விலகச் செய்யும் ஒரு பழக்கத்தைச் சிந்தித்து, அதனை மாற்ற முயற்சி செய்யுங்கள்."
+  },
+  {
+    date: "11-30",
+    feast: "திருத்தூதர் புனித அந்திரேயாவின் திருநாள்",
+    title: "வாரும், என்னைப் பின்தொடருங்கள்",
+    readings: "உரோமையர் 10:9–18 | மத்தேயு 4:18–22",
+    reflection: "இயேசு அந்திரேயாவை அழைத்தபோது, அவர் அனைத்தையும் விட்டுவிட்டு இயேசுவைப் பின்தொடர்ந்தார். இயேசுவுக்கு எவ்விதத் தாமதமுமின்றி 'ஆம்' என்று பதிலளிக்க வேண்டும் என்பதைப் புனித அந்திரேயா நமக்குக் கற்றுத் தருகிறார்.\n\nசில நேரங்களில் நாம் சந்தேகப்படுகிறோம் அல்லது நமது சொந்தத் திட்டங்களிலும் வேலைகளிலும் மூழ்கி இறைவனின் குரலைக் கேட்க மறந்து விடுகிறோம். இயேசுவைப் பின்பற்றுவது என்பது அவருக்கு முதலிடம் கொடுத்து, அவரது போதனைகளின்படி வாழ்வதாகும்.\n\nபுனித அந்திரேயாவைப் போல நாமும் மற்றவர்களை இயேசுவின் அருகில் அழைத்துச் செல்ல அழைக்கப்பட்டுள்ளோம்.",
+    actTitle: "ஒருவரை கிறிஸ்துவின் அருகில் அழைத்துச் செல்வோம்",
+    activity: "இன்று நீங்களாகவே தயாரித்த ஓர் ஊக்கமளிக்கும் செய்தியை ஒருவருக்கு அனுப்புங்கள். உங்களுடன் இணைந்து செபிக்க ஒருவரை அழையுங்கள் அல்லது இயேசுவைப் பற்றிய ஓர் அன்பான வார்த்தையை ஒருவருடன் பகிர்ந்து கொள்ளுங்கள்."
+  },
+  {
+    date: "12-01",
+    title: "இறைவனின் பார்வையில் உலகைப் பார்ப்போம்",
+    readings: "எசாயா 11:1–10 | லூக்கா 10:21–24",
+    reflection: "அமைதியும் நீதியும் நிறைந்த ஓர் உலகத்தைப் பற்றி இறைவாக்கினர் எசாயா எடுத்துரைக்கிறார். தாழ்மையான உள்ளம் கொண்டவர்களுக்கே இறைவன் தம்மை வெளிப்படுத்துகிறார் என்பதை இயேசு நற்செய்தியில் நமக்கு நினைவூட்டுகிறார்.\n\nஇறைவன் நமது வெளித்தோற்றத்தை விட இதயத்தையே பார்க்கிறார். இறைவன் உங்களை எவ்வாறு பார்க்கிறார் என்று நீங்கள் எப்போதாவது சிந்தித்ததுண்டா? நாம் யாராக இருந்தாலும், நம்மை அவர் அன்புடனும் மதிப்புடனும் பார்க்கிறார்.\n\nதிருவருகைக் காலம் தாழ்மையுடன் வாழவும், ஒவ்வொருவரையும் மதிக்கவும், மற்றவர்களிடம் காணப்படும் நன்மைகளை உணரவும் நமக்கு அழைப்பு விடுக்கிறது.",
+    actTitle: "தாழ்மையைப் பழகுவோம்",
+    activity: "இன்று ஒருவரின் கருத்தைக் பொறுமையுடன் செவிமடுங்கள். அவரைத் தீர்ப்பிடாமல், அன்புடனும் மரியாதையுடனும் நடத்துங்கள்."
+  },
+  {
+    date: "12-02",
+    title: "இயேசு = இரக்கம்",
+    readings: "எசாயா 25:6–10அ | மத்தேயு 15:29–37",
+    reflection: "நற்செய்தியில், பசியுடன் இருந்த மக்களைக் கண்ட இயேசு அவர்கள் மீது ஆழ்ந்த இரக்கம் கொள்கிறார். அவர் அப்பங்களைப் பெருகச் செய்து மக்களுக்கு உணவளிக்கிறார்.\n\nஇங்கு நாம் உணர வேண்டிய மிகப்பெரிய அதிசயம் அப்பங்கள் பெருகியதல்ல; மாறாக, இயேசுவின் ஆழ்ந்த இரக்கமே ஆகும்.\n\nஇரக்கமுள்ள இதயம் நம்மால் செய்யப்படும் ஒவ்வொரு செயலையும் சிறப்பானதாக மாற்றுகிறது. மற்றவர்களுக்கு உதவுவதற்கு நம்மிடம் அதிகமான செல்வமோ பொருட்களோ இருக்க வேண்டிய அவசியமில்லை. நம்மால் செய்யப்படும் ஒரு சிறிய இரக்கச் செயலும் ஒருவரின் வாழ்க்கையில் பெரிய மாற்றத்தை ஏற்படுத்தலாம்.",
+    actTitle: "உங்களிடம் இருப்பதைப் பகிர்ந்து கொள்வோம்",
+    activity: "இன்று ஒருவருடைய தேவைகளைக் கவனியுங்கள். அது உணவாகவோ, உங்கள் நேரமாகவோ, அறிவாகவோ அல்லது உதவும் கரமாகவோ இருக்கலாம். உங்களால் முடிந்ததை மற்றவர்களுடன் பகிர்ந்து கொள்ளுங்கள்."
+  },
+  {
+    date: "12-03",
+    feast: "புனித பிரான்சிஸ் சவேரியாரின் நினைவுத் திருநாள்",
+    title: "உறுதியான அடித்தளத்தின் மீது நமது வாழ்க்கையைக் கட்டியெழுப்புவோம்",
+    readings: "எசாயா 26:1–6 | மத்தேயு 7:21, 24–27",
+    reflection: "இறைவார்த்தையைக் கேட்பது மட்டுமே போதாது; அதன்படி நாம் செயல்படவும் வேண்டும் என்று இயேசு நமக்குக் கற்பிக்கிறார்.\n\nஒரு வீடு உறுதியாக நிலைத்து நிற்பதற்கு வலுவான அடித்தளம் அவசியம். அதுபோலவே, நமது வாழ்க்கையும் விசுவாசம் என்னும் உறுதியான அடித்தளத்தின் மீது கட்டியெழுப்பப்பட வேண்டும்.\n\nநமது விசுவாசம் நாம் பேசும் வார்த்தைகளிலும், நடந்துகொள்ளும் விதத்திலும், மற்றவர்களை நடத்தும் முறையிலும் வெளிப்பட வேண்டும்.\n\nஅன்றாட வாழ்க்கையின் ஒவ்வொரு தருணமும் இயேசுவின் போதனைகளைச் செயல்படுத்த நமக்குக் கிடைக்கும் ஒரு வாய்ப்பாகும்.",
+    actTitle: "இயேசுவின் போதனைகளின்படி செயல்படுவோம்",
+    activity: "இன்று பின்வரும் செயல்களில் குறைந்தது ஒன்றையாவது சிறப்பாகச் செய்ய முயற்சி செய்யுங்கள்:\n- கோபப்படுவதற்குப் பதிலாக அன்பான வார்த்தைகளைப் பேசுங்கள்.\n- மனக்கசப்பை வைத்திருப்பதற்குப் பதிலாக ஒருவரை மன்னியுங்கள்.\n- வீட்டில் யாராவது கேட்கும் வரை காத்திருக்காமல், நீங்களாகவே உதவி செய்யுங்கள்.\n- கடினமாக இருந்தாலும் நேர்மையாக நடந்துகொள்ளுங்கள்.\n\nஇந்தச் செயல்களில் குறைந்தது ஒன்றையாவது இன்று உங்கள் வாழ்க்கையில் நடைமுறைப்படுத்துங்கள்."
+  },
+  {
+    date: "12-04",
+    title: "ஆண்டவரே, என் கண்களைத் திறந்தருளும்",
+    readings: "எசாயா 29:17–24 | மத்தேயு 9:27–31",
+    reflection: "இன்றைய நற்செய்தியில், நம்பிக்கையுடன் தம்மிடம் வந்த பார்வையற்ற இருவருக்கும் இயேசு பார்வையளிக்கிறார்.\n\nசில நேரங்களில் நம்மைச் சுற்றியுள்ள உதவி, அன்பு மற்றும் கவனம் தேவைப்படும் மனிதர்களைக் கவனிக்கத் தவறிவிடுகிறோம். நமது சொந்த வாழ்க்கையின் வேலைப்பளுவில் மூழ்கி, மற்றவர்களின் துன்பங்களையும் தேவைகளையும் காணத் தவறுகிறோம்.\n\nதிருவருகைக் காலம் நமது கண்களைத் திறந்து, மற்றவர்களிடம் அதிக அக்கறையும் கரிசனையும் காட்டும் மனிதர்களாக வாழ நமக்கு அழைப்பு விடுக்கிறது.\n\nநம்மைச் சுற்றியுள்ளவர்களின் தேவைகளைக் கவனித்து, அன்புடன் பதிலளிக்கக் கற்றுக்கொள்வோம்.",
+    actTitle: "உங்களைத் தாண்டி மற்றவர்களையும் கவனிப்போம்",
+    activity: "பெரும்பாலும் மற்றவர்களால் கவனிக்கப்படாமல் அல்லது ஒதுக்கப்பட்டு இருக்கும் ஒருவரைக் கவனியுங்கள். அவருடன் சிறிது நேரம் செலவிடுங்கள். அன்பான வார்த்தை ஒன்றைக் கூறுங்கள் அல்லது உங்களால் முடிந்த உதவியைச் செய்யுங்கள்."
+  },
+  {
+    date: "12-05",
+    title: "இலவசமாகப் பெற்றுக்கொண்டீர்கள்; இலவசமாகக் கொடுங்கள்",
+    readings: "எசாயா 30:19–21, 23–26 | மத்தேயு 9:35–10:1, 5அ, 6–8",
+    reflection: "இயேசு மக்களை அன்புடனும் இரக்கத்துடனும் நோக்கி, அவர்களுக்கு உதவுவதற்காகத் தமது சீடர்களை அனுப்புகிறார். நீங்கள் இலவசமாகப் பெற்றுக்கொண்டதை இலவசமாகக் கொடுங்கள் என்று அவர்களுக்கு நினைவூட்டுகிறார்.\n\nநம்மிடம் இருப்பவை அனைத்தும் இறைவன் நமக்கு வழங்கிய கொடைகளாகும். நமது திறமைகள், நேரம் மற்றும் ஆசீர்வாதங்கள் அனைத்தும் மற்றவர்களுடன் பகிர்ந்து கொள்வதற்காகவே நமக்குக் கொடுக்கப்பட்டுள்ளன.\n\nநமது செயல்களின் மூலம் இறைவனின் அன்பை மற்றவர்களுக்குப் பரப்ப நாம் அழைக்கப்பட்டுள்ளோம்.",
+    actTitle: "ஒருவருக்கு ஆசீர்வாதமாக மாறுவோம்",
+    activity: "இன்று எவ்விதப் பிரதிபலனையும் எதிர்பார்க்காமல் ஒருவருக்கு நன்மை செய்யுங்கள். ஒருவருக்கு உதவுங்கள், நண்பர் ஒருவரை உற்சாகப்படுத்துங்கள் அல்லது தேவையில் இருக்கும் ஒருவருக்காகச் செபியுங்கள்."
+  }
+];
+
 // ---- Builds the full season (29 Nov – 25 Dec). No need to edit below. ----
 function buildDays() {
-  const byDate = {}, siByDate = {};
+  const byDate = {}, siByDate = {}, taByDate = {};
   ENGLISH.forEach(e => { byDate[e.date] = e; });
   SINHALA.forEach(e => { siByDate[e.date] = e; });
+  TAMIL.forEach(e => { taByDate[e.date] = e; });
   const pack = e => e ? {
     title: e.title, feast: e.feast || "", readings: e.readings || "",
     reflection: e.reflection, actTitle: e.actTitle || "", activity: e.activity
@@ -156,10 +226,10 @@ function buildDays() {
     const date = String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
     const e = byDate[date];
     const en = pack(e);
-    // Sinhala falls back to English for any day not translated yet;
-    // Tamil text has not been provided yet, so it shows English.
+    // Sinhala and Tamil fall back to English for any day not translated yet.
     const si = pack(siByDate[date]) || en;
-    days.push({ day: i, date, img: (e && e.img) || "", en, si, ta: en });
+    const ta = pack(taByDate[date]) || en;
+    days.push({ day: i, date, img: (e && e.img) || "", en, si, ta });
   }
   return days;
 }
